@@ -1,0 +1,56 @@
+# EESchema Netlist Version 1.1 created  Monday 22 October 2012 04:28:50 PM IST
+(
+ ( /506BDD23 D3 D1 1n4007
+  ( 1 N-000003 )
+  ( 2 N-000004 )
+ )
+ ( /506BDD29 D3 D2 1n4007
+  ( 1 N-000001 )
+  ( 2 N-000004 )
+ )
+ ( /506BDD38 D3 D3 1n4007
+  ( 1 GND )
+  ( 2 N-000003 )
+ )
+ ( /506BDD2F D3 D4 1n4007
+  ( 1 GND )
+  ( 2 N-000001 )
+ )
+ ( /506BDD54 R3 R1 1000
+  ( 1 N-000004 )
+  ( 2 GND )
+ )
+ ( /506BDD71 R1 V1 SINE
+  ( 1 N-000003 )
+  ( 2 N-000001 )
+ )
+)
+*
+{ Allowed footprints by component:
+$component D1
+ D?
+ S*
+$endlist
+$component D2
+ D?
+ S*
+$endlist
+$component D3
+ D?
+ S*
+$endlist
+$component D4
+ D?
+ S*
+$endlist
+$component R1
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component V1
+ 1_pin
+$endlist
+$endfootprintlist
+}

@@ -1,0 +1,80 @@
+# EESchema Netlist Version 1.1 created  Monday 01 October 2012 11:23:34 AM IST
+(
+ ( /50692628 $noname  R3 1 {Lib=R}
+  (    1 N-000003 )
+  (    2 N-000004 )
+ )
+ ( /5069261E $noname  R4 1 {Lib=R}
+  (    1 N-000003 )
+  (    2 N-000001 )
+ )
+ ( /50692613 $noname  R1 1 {Lib=R}
+  (    1 N-000004 )
+  (    2 N-000001 )
+ )
+ ( /5067FEAC $noname  R2 1 {Lib=R}
+  (    1 N-000004 )
+  (    2 GND )
+ )
+ ( /5067FE8E R3  v2 DC {Lib=DC}
+  (    1 N-000003 )
+  (    2 GND )
+ )
+ ( /5067FE8A R3  v1 DC {Lib=DC}
+  (    1 N-000001 )
+  (    2 GND )
+ )
+)
+*
+{ Allowed footprints by component:
+$component R3
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R4
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R1
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R2
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component v2
+ 1_pin
+$endlist
+$component v1
+ 1_pin
+$endlist
+$endfootprintlist
+}
+{ Pin List by Nets
+Net 1 "" ""
+ R4 2
+ R1 2
+ v1 1
+Net 2 "GND" "GND"
+ v1 2
+ v2 2
+ R2 2
+Net 3 "" ""
+ v2 1
+ R3 1
+ R4 1
+Net 4 "" ""
+ R3 2
+ R2 1
+ R1 1
+}
+#End

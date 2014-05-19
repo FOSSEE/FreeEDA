@@ -1,0 +1,15 @@
+* eeschema netlist version 1.1 (spice format) creation date: monday 15 april 2013 03:25:12 pm ist
+
+v1  3 0 dc 10
+r2  1 0 2000
+r1  3 1 500
+d1  0 1 zener
+
+.dc  v1 0e-00 10e-00 5e-03
+
+* Control Statements 
+.control
+run
+plot -v(1) 
+.endc
+.end

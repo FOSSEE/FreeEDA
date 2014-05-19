@@ -1,0 +1,16 @@
+ 	name 	parameter  							units 		default 	example 	
+1 	IS 	saturation current 						A 		1.0e-14 	1.0e-14 	
+2 	RS 	ohmic resistanc							Ohm 		0 		10 	
+3 	N 	emission coefficient 						- 		1 		1.0 	
+4 	TT 	transit-time 							sec 		0 		0.1ns 	
+5 	CJO 	zero-bias junction capacitance 					F 		0 		2pF 		
+6 	VJ 	junction potential 						V 		1 		0.6 	
+7 	M 	grading coefficient 						- 		0.5 		0.5 	
+8 	EG 	band-gap energy 						eV 		1.11 		1.11 Si 	
+9 	XTI 	saturation-current temp.exp 					- 		3.0 		3.0 pn/ 2.0 Schottky 	
+10 	KF 	flicker noise coefficient 					- 		0	 		
+11 	AF 	flicker noise exponent 						- 		1 		
+12 	FC 	coefficient for forward-bias depletion capacitance formula 	- 		0.5 		
+13 	BV 	reverse breakdown voltage 					V 		infinite 	40.0 	
+14 	IBV 	current at breakdown voltage 					V 		1.0e-3 		
+15 	TNOM 	parameter measurement temperature 				deg C 		27 		50 

@@ -1,0 +1,30 @@
+# EESchema Netlist Version 1.1 created  Thursday 16 May 2013 01:22:40 AM IST
+(
+ ( /5186342E C1 C1 1u
+  ( 1 N-000001 )
+  ( 2 GND )
+ )
+ ( /51868B92 SIL-2 P1 CONN_2
+  ( 1 GND )
+  ( 2 N-000003 )
+ )
+ ( /51863417 R3 R1 1k
+  ( 1 N-000001 )
+  ( 2 N-000003 )
+ )
+)
+*
+{ Allowed footprints by component:
+$component C1
+ SM*
+ C?
+ C1-1
+$endlist
+$component R1
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$endfootprintlist
+}

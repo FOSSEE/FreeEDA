@@ -1,0 +1,23 @@
+* eeschema netlist version 1.1 (spice format) creation date: thursday 20 december 2012 12:05:00 am ist
+
+* Plotting option vplot8_1
+r1  5 0 1000
+v1  1 0 pulse(0 5 0 0 0 0.25e-6 0.5e-6)
+v2  4 0 5
+* 7400
+a1 [1] [1_in]  u1adc
+a2 [4] [4_in]  u1adc
+a3 [1_in 4_in] 5_out u1
+a4 [5_out] [5]  u1dac
+.model u1 d_nand
+.model u1adc adc_bridge(in_low=0.8 in_high=2.0)
+.model u1dac dac_bridge(out_low=0.25 out_high=5.0 out_undef=1.8 t_rise=0.5e-9 t_fall=0.5e-9)
+
+.tran  10e-09 1e-06 0e-00
+
+* Control Statements 
+.control
+run
+plot v(1) v(5) 
+.endc
+.end

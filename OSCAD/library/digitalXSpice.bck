@@ -1,0 +1,23 @@
+EESchema-DOCLIB  Version 2.0  Date: Tuesday 18 December 2012 11:53:32 PM IST
+#
+$CMP D_NOR
+D Nor2
+K Nor2
+$ENDCMP
+#
+$CMP D_OR
+D Or2
+K Or2
+$ENDCMP
+#
+$CMP D_XNOR
+D XNOR 2 inputs
+K XNOR2
+$ENDCMP
+#
+$CMP D_XOR
+D XOR 2 inputs
+K XOR2
+$ENDCMP
+#
+#End Doc Library

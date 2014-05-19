@@ -1,0 +1,6 @@
+V1 1 0 sine (5 50)
+D2 1 2 mymodel (1e-8 0.026)
+R3 2 0 1
+.tran 0 100 0.5
+.plot v(1) v(2) 
+.end

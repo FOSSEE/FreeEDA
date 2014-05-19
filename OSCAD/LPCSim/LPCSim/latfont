@@ -1,0 +1,8 @@
+echo {\\input{$*.pstex_t}} >& dummy_font.tex
+cat latfont1.tex dummy_font.tex latfont2.tex >& dummy_fig.tex
+latex dummy_fig.tex
+dvips -E -o dummy_fig.eps dummy_fig.dvi
+mv dummy_fig.eps $*.eps
+rm dummy_fig.*
+rm -rf dummy_font.tex
+evince $1.eps &

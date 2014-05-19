@@ -1,0 +1,44 @@
+# EESchema Netlist Version 1.1 created  Friday 12 April 2013 02:41:23 PM IST
+(
+ ( /5166A210 $noname$ D1 DIODE
+  ( 1 N-000002 )
+  ( 2 N-000004 )
+ )
+ ( /5166A1EB $noname$ R1 100
+  ( 1 N-000001 )
+  ( 2 N-000002 )
+ )
+ ( /5166A34A $noname$ U1 IPLOT
+  ( 1 N-000004 )
+  ( 2 N-000003 )
+ )
+ ( /5166A1AC R1 v1 SINE
+  ( 1 N-000001 )
+  ( 2 GND )
+ )
+ ( /5166A26E R1 v2 12V
+  ( 1 N-000003 )
+  ( 2 GND )
+ )
+)
+*
+{ Allowed footprints by component:
+$component D1
+ D?
+ S*
+$endlist
+$component R1
+ R?
+ SM0603
+ SM0805
+ R?-*
+ SM1206
+$endlist
+$component v1
+ 1_pin
+$endlist
+$component v2
+ 1_pin
+$endlist
+$endfootprintlist
+}

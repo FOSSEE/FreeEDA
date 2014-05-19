@@ -1,0 +1,6 @@
+.model npn NPN( Vtf= Cjc= Nc= Tr= Ne= 
++ Cje= Vjc= Xtb= Rb= Rc= 
++ Tf= Xti= Ikr= Bf=50 Fc= 
++ Ikf= Br= Mje= Mjc= Vaf= 
++ Isc= Ise= Xtf= Vje= Is= 
++ Itf= Eg= )

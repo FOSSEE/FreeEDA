@@ -1,0 +1,16 @@
+[Desktop Entry]
+Version=0.9
+Name=OSCAD
+Comment=Open Source CAD
+GenericName=OSCAD
+Keywords=eda-tools
+Exec=oscad %u
+Terminal=false
+X-MultipleArgs=false
+Type=Application
+Icon=/usr/share/icons/oscad.png
+Categories=Development;
+MimeType=text/html;text/xml;application/xhtml+xml;application/xml;application/rss+xml;application/rdf+xml;image/gif;image/jpeg;image/png;x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/ftp;x-scheme-handler/chrome;video/webm;application/x-xpinstall;
+StartupNotify=true
+Actions=NewWindow;NewPrivateWindow;
+

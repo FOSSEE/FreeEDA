@@ -1,0 +1,99 @@
+# EESchema Netlist Version 1.1 created  Monday 22 October 2012 04:10:55 PM IST
+(
+ ( /50695730 bornier4 E1 0.5
+  ( 1 N-000005 )
+  ( 2 N-000006 )
+  ( 3 /a )
+  ( 4 /b )
+ )
+ ( /5069566A bornier4 G1 0.5
+  ( 1 N-000006 )
+  ( 2 /a )
+  ( 3 GND )
+  ( 4 /b )
+ )
+ ( /506956A6 R1 I1 DC
+  ( 1 GND )
+  ( 2 N-000006 )
+ )
+ ( /506955C2 R3 R1 1
+  ( 1 N-000005 )
+  ( 2 N-000004 )
+ )
+ ( /506955C7 R3 R2 1
+  ( 1 N-000005 )
+  ( 2 GND )
+ )
+ ( /506955D8 R3 R3 1
+  ( 1 /b )
+  ( 2 GND )
+ )
+ ( /506955CC R3 R4 1
+  ( 1 /b )
+  ( 2 N-000006 )
+ )
+ ( /506955D1 R3 R5 0.5
+  ( 1 /a )
+  ( 2 /b )
+ )
+ ( /506955DC R3 R6 1
+  ( 1 /a )
+  ( 2 GND )
+ )
+ ( /50695694 R1 V1 DC
+  ( 1 N-000004 )
+  ( 2 GND )
+ )
+)
+*
+{ Allowed footprints by component:
+$component E1
+ 1_pin
+$endlist
+$component G1
+ 1_pin
+$endlist
+$component I1
+ 1_pin
+$endlist
+$component R1
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R2
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R3
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R4
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R5
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R6
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component V1
+ 1_pin
+$endlist
+$endfootprintlist
+}

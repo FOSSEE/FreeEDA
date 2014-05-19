@@ -1,0 +1,573 @@
+EESchema Schematic File Version 2  date Monday 29 April 2013 11:24:17 AM IST
+LIBS:power
+LIBS:device
+LIBS:transistors
+LIBS:conn
+LIBS:linear
+LIBS:regul
+LIBS:74xx
+LIBS:cmos4000
+LIBS:adc-dac
+LIBS:memory
+LIBS:xilinx
+LIBS:special
+LIBS:microcontrollers
+LIBS:dsp
+LIBS:microchip
+LIBS:analog_switches
+LIBS:motorola
+LIBS:texas
+LIBS:intel
+LIBS:audio
+LIBS:interface
+LIBS:digital-audio
+LIBS:philips
+LIBS:display
+LIBS:cypress
+LIBS:siliconi
+LIBS:opto
+LIBS:atmel
+LIBS:contrib
+LIBS:valves
+LIBS:analogSpice
+LIBS:analogXSpice
+LIBS:convergenceAidSpice
+LIBS:converterSpice
+LIBS:digitalSpice
+LIBS:digitalXSpice
+LIBS:linearSpice
+LIBS:measurementSpice
+LIBS:portSpice
+LIBS:sourcesSpice
+EELAYER 43  0
+EELAYER END
+$Descr A4 11700 8267
+encoding utf-8
+Sheet 1 1
+Title ""
+Date "29 apr 2013"
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+Connection ~ 3450 1150
+Connection ~ 3300 5050
+Connection ~ 4900 2900
+$Comp
+L VPLOT8_1 U3
+U 8 1 517E0976
+P 4900 2600
+F 0 "U3" H 4750 2700 50  0000 C CNN
+F 1 "VPLOT8_1" H 5050 2700 50  0000 C CNN
+	8    4900 2600
+	1    0    0    -1  
+$EndComp
+Connection ~ 3750 3100
+Connection ~ 3900 2550
+Connection ~ 4000 3000
+Connection ~ 4750 2600
+Connection ~ 5500 2950
+Connection ~ 3900 4150
+$Comp
+L VPLOT8_1 U3
+U 5 1 517E0908
+P 3900 3850
+F 0 "U3" H 3750 3950 50  0000 C CNN
+F 1 "VPLOT8_1" H 4050 3950 50  0000 C CNN
+	5    3900 3850
+	1    0    0    -1  
+$EndComp
+$Comp
+L VPLOT8_1 U3
+U 2 1 517E0903
+P 2950 3850
+F 0 "U3" H 2800 3950 50  0000 C CNN
+F 1 "VPLOT8_1" H 3100 3950 50  0000 C CNN
+	2    2950 3850
+	1    0    0    -1  
+$EndComp
+$Comp
+L VPLOT8_1 U3
+U 1 1 517E08FC
+P 2750 2650
+F 0 "U3" H 2600 2750 50  0000 C CNN
+F 1 "VPLOT8_1" H 2900 2750 50  0000 C CNN
+	1    2750 2650
+	1    0    0    -1  
+$EndComp
+$Comp
+L VPLOT8_1 U3
+U 3 1 517E08F3
+P 3750 2800
+F 0 "U3" H 3600 2900 50  0000 C CNN
+F 1 "VPLOT8_1" H 3900 2900 50  0000 C CNN
+	3    3750 2800
+	1    0    0    -1  
+$EndComp
+$Comp
+L VPLOT8_1 U3
+U 6 1 517E08EB
+P 4000 2700
+F 0 "U3" H 3850 2800 50  0000 C CNN
+F 1 "VPLOT8_1" H 4150 2800 50  0000 C CNN
+	6    4000 2700
+	1    0    0    -1  
+$EndComp
+$Comp
+L VPLOT8_1 U3
+U 4 1 517E08E7
+P 3900 2250
+F 0 "U3" H 3750 2350 50  0000 C CNN
+F 1 "VPLOT8_1" H 4050 2350 50  0000 C CNN
+	4    3900 2250
+	1    0    0    -1  
+$EndComp
+$Comp
+L VPLOT8_1 U3
+U 7 1 517E08DA
+P 4750 2300
+F 0 "U3" H 4600 2400 50  0000 C CNN
+F 1 "VPLOT8_1" H 4900 2400 50  0000 C CNN
+	7    4750 2300
+	1    0    0    -1  
+$EndComp
+$Comp
+L VPLOT8_1 U13
+U 1 1 517E08D5
+P 5500 2650
+F 0 "U13" H 5350 2750 50  0000 C CNN
+F 1 "VPLOT8_1" H 5650 2750 50  0000 C CNN
+	1    5500 2650
+	1    0    0    -1  
+$EndComp
+Connection ~ 4000 5050
+Wire Wire Line
+	4000 5050 4000 5550
+Wire Wire Line
+	4000 5550 3350 5550
+Connection ~ 2350 2550
+Wire Wire Line
+	2350 2550 2350 4150
+Wire Wire Line
+	2350 4150 1900 4150
+Connection ~ 3100 1150
+Connection ~ 2400 2550
+Connection ~ 2650 2750
+Wire Wire Line
+	2250 2550 2650 2550
+Wire Wire Line
+	2650 2550 2650 2950
+Connection ~ 2750 2950
+Wire Wire Line
+	2750 2950 2750 3300
+Wire Wire Line
+	2750 3300 3750 3300
+Wire Wire Line
+	3750 3300 3750 2950
+Wire Wire Line
+	5250 2250 5250 2400
+Wire Wire Line
+	5900 2750 5900 2450
+Wire Wire Line
+	5900 3800 5900 4000
+Connection ~ 5250 2950
+Wire Wire Line
+	5250 2950 5600 2950
+Wire Wire Line
+	5250 3650 5250 4200
+Wire Wire Line
+	4500 4350 4500 4550
+Wire Wire Line
+	4500 3750 4500 3950
+Connection ~ 3450 2550
+Wire Wire Line
+	3450 2550 4900 2550
+Wire Wire Line
+	4900 2550 4900 3000
+Connection ~ 4350 1150
+Wire Wire Line
+	3100 1650 3100 1950
+Wire Wire Line
+	4600 1650 4600 1950
+Wire Wire Line
+	2550 3250 2550 3350
+Wire Wire Line
+	4350 3200 4600 3200
+Wire Wire Line
+	3300 4550 3300 4350
+Wire Wire Line
+	2550 4350 2550 4550
+Wire Wire Line
+	2550 3850 2550 3950
+Connection ~ 3300 3150
+Wire Wire Line
+	3300 3750 3300 3950
+Wire Wire Line
+	3450 3150 3100 3150
+Wire Wire Line
+	2650 2950 2800 2950
+Wire Wire Line
+	3100 2750 3100 2450
+Wire Wire Line
+	3450 2450 3450 2750
+Wire Wire Line
+	3000 4150 2850 4150
+Wire Wire Line
+	2550 3900 2950 3900
+Wire Wire Line
+	2950 3900 2950 4150
+Connection ~ 2950 4150
+Connection ~ 2550 3900
+Wire Wire Line
+	3100 2650 3950 2650
+Connection ~ 3100 2650
+Wire Wire Line
+	3950 2650 3950 3000
+Wire Wire Line
+	3950 3000 4050 3000
+Wire Wire Line
+	4600 2800 4600 2450
+Wire Wire Line
+	3300 3150 3300 3250
+Wire Wire Line
+	3450 1650 3450 1950
+Wire Wire Line
+	4350 1150 4350 2800
+Wire Wire Line
+	4950 2600 4600 2600
+Connection ~ 4600 2600
+Connection ~ 4600 1150
+Wire Wire Line
+	4500 3200 4500 3250
+Connection ~ 4500 3200
+Wire Wire Line
+	2950 4150 4200 4150
+Wire Wire Line
+	5250 2800 5250 3150
+Wire Wire Line
+	5250 5050 5250 4700
+Connection ~ 4500 5050
+Wire Wire Line
+	5900 3150 5900 3300
+Wire Wire Line
+	5900 4500 5900 5050
+Wire Wire Line
+	5900 5050 2550 5050
+Connection ~ 5250 5050
+Wire Wire Line
+	5250 1650 5250 1750
+Wire Wire Line
+	5900 1950 5900 1150
+Connection ~ 5250 1150
+Wire Wire Line
+	2650 2750 2550 2750
+Wire Wire Line
+	5900 1150 1900 1150
+Wire Wire Line
+	1900 1150 1900 3250
+Wire Wire Line
+	2450 2550 2450 5550
+Connection ~ 2450 2550
+$Comp
+L DC v2
+U 1 1 517E089A
+P 2900 5550
+F 0 "v2" H 2700 5650 60  0000 C CNN
+F 1 "15" H 2700 5500 60  0000 C CNN
+F 2 "R1" H 2600 5550 60  0000 C CNN
+	1    2900 5550
+	0    -1   1    0   
+$EndComp
+$Comp
+L PWR_FLAG #FLG01
+U 1 1 517E07C2
+P 2400 2550
+F 0 "#FLG01" H 2400 2820 30  0001 C CNN
+F 1 "PWR_FLAG" H 2400 2780 30  0000 C CNN
+	1    2400 2550
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR02
+U 1 1 517E07B3
+P 2250 2550
+F 0 "#PWR02" H 2250 2550 30  0001 C CNN
+F 1 "GND" H 2250 2480 30  0001 C CNN
+	1    2250 2550
+	1    0    0    -1  
+$EndComp
+$Comp
+L IPLOT U14
+U 1 1 517E06CB
+P 5900 2200
+F 0 "U14" H 5750 2300 50  0000 C CNN
+F 1 "IPLOT" H 6050 2300 50  0000 C CNN
+	1    5900 2200
+	0    1    1    0   
+$EndComp
+$Comp
+L IPLOT U11
+U 1 1 517E06B1
+P 5250 2000
+F 0 "U11" H 5100 2100 50  0000 C CNN
+F 1 "IPLOT" H 5400 2100 50  0000 C CNN
+	1    5250 2000
+	0    1    1    0   
+$EndComp
+$Comp
+L R R7
+U 1 1 517E061A
+P 5900 4250
+F 0 "R7" V 5980 4250 50  0000 C CNN
+F 1 "3k" V 5900 4250 50  0000 C CNN
+	1    5900 4250
+	1    0    0    -1  
+$EndComp
+$Comp
+L IPLOT U15
+U 1 1 517E060D
+P 5900 3550
+F 0 "U15" H 5750 3650 50  0000 C CNN
+F 1 "IPLOT" H 6050 3650 50  0000 C CNN
+	1    5900 3550
+	0    1    1    0   
+$EndComp
+$Comp
+L NPN Q9
+U 1 1 517E05E2
+P 5800 2950
+F 0 "Q9" H 5800 2800 50  0000 R CNN
+F 1 "NPN" H 5800 3100 50  0000 R CNN
+	1    5800 2950
+	1    0    0    -1  
+$EndComp
+$Comp
+L IPLOT U12
+U 1 1 517E05AE
+P 5250 3400
+F 0 "U12" H 5100 3500 50  0000 C CNN
+F 1 "IPLOT" H 5400 3500 50  0000 C CNN
+	1    5250 3400
+	0    1    1    0   
+$EndComp
+$Comp
+L R R6
+U 1 1 517E0593
+P 5250 4450
+F 0 "R6" V 5330 4450 50  0000 C CNN
+F 1 "15.7k" V 5250 4450 50  0000 C CNN
+	1    5250 4450
+	1    0    0    -1  
+$EndComp
+$Comp
+L IPLOT U9
+U 1 1 517E0566
+P 4500 4800
+F 0 "U9" H 4350 4900 50  0000 C CNN
+F 1 "IPLOT" H 4650 4900 50  0000 C CNN
+	1    4500 4800
+	0    1    1    0   
+$EndComp
+$Comp
+L IPLOT U6
+U 1 1 517E0562
+P 3300 4800
+F 0 "U6" H 3150 4900 50  0000 C CNN
+F 1 "IPLOT" H 3450 4900 50  0000 C CNN
+	1    3300 4800
+	0    1    1    0   
+$EndComp
+$Comp
+L IPLOT U2
+U 1 1 517E055E
+P 2550 4800
+F 0 "U2" H 2400 4900 50  0000 C CNN
+F 1 "IPLOT" H 2700 4900 50  0000 C CNN
+	1    2550 4800
+	0    1    1    0   
+$EndComp
+$Comp
+L NPN Q6
+U 1 1 517E0538
+P 4400 4150
+F 0 "Q6" H 4400 4000 50  0000 R CNN
+F 1 "NPN" H 4400 4300 50  0000 R CNN
+	1    4400 4150
+	1    0    0    -1  
+$EndComp
+$Comp
+L IPLOT U8
+U 1 1 517E0528
+P 4500 3500
+F 0 "U8" H 4350 3600 50  0000 C CNN
+F 1 "IPLOT" H 4650 3600 50  0000 C CNN
+	1    4500 3500
+	0    1    1    0   
+$EndComp
+$Comp
+L R R5
+U 1 1 517E04FA
+P 5250 1400
+F 0 "R5" V 5330 1400 50  0000 C CNN
+F 1 "2.3k" V 5250 1400 50  0000 C CNN
+	1    5250 1400
+	1    0    0    -1  
+$EndComp
+$Comp
+L IPLOT U10
+U 1 1 517E04B8
+P 4600 2200
+F 0 "U10" H 4450 2300 50  0000 C CNN
+F 1 "IPLOT" H 4750 2300 50  0000 C CNN
+	1    4600 2200
+	0    1    1    0   
+$EndComp
+$Comp
+L IPLOT U7
+U 1 1 517E04B5
+P 3450 2200
+F 0 "U7" H 3300 2300 50  0000 C CNN
+F 1 "IPLOT" H 3600 2300 50  0000 C CNN
+	1    3450 2200
+	0    1    1    0   
+$EndComp
+$Comp
+L IPLOT U4
+U 1 1 517E04B0
+P 3100 2200
+F 0 "U4" H 2950 2300 50  0000 C CNN
+F 1 "IPLOT" H 3250 2300 50  0000 C CNN
+	1    3100 2200
+	0    1    1    0   
+$EndComp
+$Comp
+L IPLOT U5
+U 1 1 517E0481
+P 3300 3500
+F 0 "U5" H 3150 3600 50  0000 C CNN
+F 1 "IPLOT" H 3450 3600 50  0000 C CNN
+	1    3300 3500
+	0    1    1    0   
+$EndComp
+$Comp
+L IPLOT U1
+U 1 1 517E0473
+P 2550 3600
+F 0 "U1" H 2400 3700 50  0000 C CNN
+F 1 "IPLOT" H 2700 3700 50  0000 C CNN
+	1    2550 3600
+	0    1    1    0   
+$EndComp
+$Comp
+L NPN Q8
+U 1 1 517E0432
+P 5150 2600
+F 0 "Q8" H 5150 2450 50  0000 R CNN
+F 1 "NPN" H 5150 2750 50  0000 R CNN
+	1    5150 2600
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R4
+U 1 1 517E0427
+P 4600 1400
+F 0 "R4" V 4680 1400 50  0000 C CNN
+F 1 "3k" V 4600 1400 50  0000 C CNN
+	1    4600 1400
+	1    0    0    -1  
+$EndComp
+$Comp
+L NPN Q7
+U 1 1 517E0411
+P 4700 3000
+F 0 "Q7" H 4700 2850 50  0000 R CNN
+F 1 "NPN" H 4700 3150 50  0000 R CNN
+	1    4700 3000
+	-1   0    0    -1  
+$EndComp
+$Comp
+L NPN Q5
+U 1 1 517E03F6
+P 4250 3000
+F 0 "Q5" H 4250 2850 50  0000 R CNN
+F 1 "NPN" H 4250 3150 50  0000 R CNN
+	1    4250 3000
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R1
+U 1 1 517E03C0
+P 2550 3000
+F 0 "R1" V 2630 3000 50  0000 C CNN
+F 1 "28.6k" V 2550 3000 50  0000 C CNN
+	1    2550 3000
+	1    0    0    -1  
+$EndComp
+$Comp
+L NPN Q1
+U 1 1 517E03AD
+P 2650 4150
+F 0 "Q1" H 2650 4000 50  0000 R CNN
+F 1 "NPN" H 2650 4300 50  0000 R CNN
+	1    2650 4150
+	-1   0    0    -1  
+$EndComp
+$Comp
+L NPN Q3
+U 1 1 517E03A2
+P 3200 4150
+F 0 "Q3" H 3200 4000 50  0000 R CNN
+F 1 "NPN" H 3200 4300 50  0000 R CNN
+	1    3200 4150
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R3
+U 1 1 517E0387
+P 3450 1400
+F 0 "R3" V 3530 1400 50  0000 C CNN
+F 1 "20k" V 3450 1400 50  0000 C CNN
+	1    3450 1400
+	1    0    0    -1  
+$EndComp
+$Comp
+L NPN Q4
+U 1 1 517E0370
+P 3550 2950
+F 0 "Q4" H 3550 2800 50  0000 R CNN
+F 1 "NPN" H 3550 3100 50  0000 R CNN
+	1    3550 2950
+	-1   0    0    -1  
+$EndComp
+$Comp
+L DC v1
+U 1 1 517E0351
+P 1900 3700
+F 0 "v1" H 1700 3800 60  0000 C CNN
+F 1 "15" H 1700 3650 60  0000 C CNN
+F 2 "R1" H 1600 3700 60  0000 C CNN
+	1    1900 3700
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R2
+U 1 1 517E0341
+P 3100 1400
+F 0 "R2" V 3180 1400 50  0000 C CNN
+F 1 "20k" V 3100 1400 50  0000 C CNN
+	1    3100 1400
+	1    0    0    -1  
+$EndComp
+$Comp
+L NPN Q2
+U 1 1 517E0337
+P 3000 2950
+F 0 "Q2" H 3000 2800 50  0000 R CNN
+F 1 "NPN" H 3000 3100 50  0000 R CNN
+	1    3000 2950
+	1    0    0    -1  
+$EndComp
+$EndSCHEMATC

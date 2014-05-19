@@ -1,0 +1,9 @@
+LPCSim_1.0_300812.tgz
+In this version, Operating point analysis with symbolic equations (matrix) is implemented for linear elements.
+
+LPCSim_1.0_030912.tgz
+Following features are added:
+Equation form.
+the system matrix values in NR iterations.  
+
+

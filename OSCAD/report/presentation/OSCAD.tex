@@ -1,0 +1,179 @@
+%$Header: /cvsroot/latex-beamer/latex-beamer/solutions/generic-talks/generic-ornate-15min-45min.en.tex,v 1.4 2004/10/07 20:53:08 tantau Exp $
+\documentclass{beamer}
+\mode<presentation>
+{
+  \usecolortheme{seahorse}
+  \usefonttheme{professionalfonts}
+  \useinnertheme{rounded}
+  \useoutertheme{shadow}
+%  \useoutertheme{smoothbars}
+}
+%\setbeamertemplate{background canvas}[vertical shading][bottom=white!10,top=blue!5]
+\usepackage{verbatim} 
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps,pgfshade}
+\usepackage{amsmath,amsfonts,amsthm,amssymb}
+\usepackage{times}
+\usepackage[T1]{fontenc}
+\usepackage{graphics}
+\usepackage{graphicx}
+%\usepackage{psfig}
+\usepackage{algorithmic}
+
+\title
+{Open source CAD tool for electronic and electrical engineers}
+
+\author[]
+{Yogesh Dilip Save}
+\institute
+{
+  Indian Institute of Technology, Bombay
+}
+%\pgfdeclareimage[height=0.7cm]{university-logo}{iitblogo.eps}
+%\logo{\pgfuseimage{university-logo}}
+
+
+\date[seminar] % (optional)
+{\today}
+
+
+\begin{document}
+%***************************************************************************************
+\begin{frame}
+  \titlepage
+\end{frame}
+%***************************************************************************************
+\begin{frame}
+  \frametitle{Presentation Outline}
+  \tableofcontents
+\end{frame}
+%***************************************************************************************
+
+\section{Modules}
+\begin{frame}
+ \frametitle{Modules}
+\begin{block}{}
+\begin{itemize}
+\item eeschema -- Schematic Editor
+\item CvPCB -- Component-Footprint mapper
+\item pcbnew -- PCB Layout Editor
+\item Analysis Inserter
+\item Component Model Builder
+\item Component Sub-circuit Builder
+\item Kicad to Ngspice netlist converter
+\item Circuit Simulator -- Ngspice
+\item Scilab based circuit simulator -- SMCSim
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{eeschema}
+\begin{block}{Problems}
+\begin{itemize}
+\item No fictitious components (sources) 
+\item[Sol:] Build a library of different kind of voltage and current sources (pulse, sine, exponential etc.)
+\item Too many components
+\item[Sol:] Build own libraries (include the components supported by ngspice (explicitly or implicitly)). \\
+   Libraries (analogSpice (analog components) and digitalSpice (digital components)) can be built by
+   \begin{enumerate}
+     \item Creating own components.
+     \item Coping components from existing libraries.
+   \end{enumerate}
+\item No measurement modules
+\item[Sol:] Build a library which gives you functionality of printing and plotting solution.  
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\begin{block}{ CvPCB and pcbnew}
+Add footprint for new components.
+\end{block}
+\end{frame}
+
+\begin{frame}
+\begin{block}{Netlist Converter}
+\begin{itemize}
+\item Insert parameters for fictitious components
+\item Convert IC into discrete blocks
+\item Insert D-A and A-D converter at appropriate place,
+\item Insert plotting and printing statement in netlist.
+\item Find current through all components.  
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\begin{block}{Analysis Inserter}
+\begin{itemize}
+\item Insert type of analysis
+\item Option of analysis
+\item Option of simulator
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+  \begin{block}{Model Editor}
+    \begin{itemize}
+            \item Provides facility to define new model.
+    \begin{itemize}
+            \item Diode
+            \item Bipolar Junction Transistor (BJT)
+            \item Metal Oxide Semiconductor (MOS)
+            \item Junction Field Effect Transistor (JFET)
+            \item IGBT
+            \item Magnetic core
+    \end{itemize}
+            \item Provides facility to edit existing model.
+            \item Provides help related to model parameter.
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \begin{block}{Sub-circuit Editor}
+    \begin{itemize}
+            \item Provides facility to define new components.
+    \begin{itemize}
+            \item Op-amp
+            \item Timer-IC555
+    \end{itemize}
+            \item Provides facility to edit existing sub-circuit.
+            \item Provides help related to components parameters.
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+\begin{block}{Circuit Simulator}
+\begin{itemize}
+\item Ngspice
+\item SMCSim
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\begin{block}{Future Plan}
+\begin{itemize}
+\item More consolidation of Kicad NgSpice netlist converter (nearly 10 days).
+\item Build a descent GUI and remove the bugs in integration (nearly 10 days).
+\item Simulate more examples which cover most of the syllabus of undergraduate in circuit theory (nearly 10 days). 
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\begin{block}{May be...........}
+\begin{itemize}
+\item Scilab based simulator 
+\item Extend Scilab based simulator for mix circuit simulation
+\end{itemize}
+\end{block}
+\end{frame}
+
+\end{document}
+

@@ -1,0 +1,25 @@
+eeschema (2011-05-25)-stable  >> Creation date: Monday 15 October 2012 02:40:18 PM IST
+
+#Cmp ( order = Reference )
+| D1         DIODE       
+| D2         DIODE       
+| D3         DIODE       
+| D4         DIODE       
+| R1         1000        
+| U1         VPLOT1      
+| U2         VPLOT       
+| V1         SINE        
+#End Cmp
+
+#Cmp ( order = Value )
+| 1000         R1        
+| DIODE        D1        
+| DIODE        D2        
+| DIODE        D3        
+| DIODE        D4        
+| SINE         V1        
+| VPLOT        U2        
+| VPLOT1       U1        
+#End Cmp
+
+#End List

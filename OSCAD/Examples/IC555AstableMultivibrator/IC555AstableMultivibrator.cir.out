@@ -1,0 +1,23 @@
+* eeschema netlist version 1.1 (spice format) creation date: thursday 06 june 2013 11:44:39 pm ist
+.include lm555n.sub
+
+.ic v(3)=0
+
+.ic v(4)=0
+* Plotting option vplot8_1
+v1  3 0 5
+r3  5 0 1000
+c2  2 0 0.01e-6
+c1  4 0 100e-12
+r2  6 4 10000
+r1  3 6 1000
+x1  0 4 5 3 2 4 6 3 lm555n
+
+.tran  50e-09 5e-06 0e-00
+
+* Control Statements 
+.control
+run
+plot v(4) v(5) 
+.endc
+.end

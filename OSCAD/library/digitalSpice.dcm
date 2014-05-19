@@ -1,0 +1,96 @@
+EESchema-DOCLIB  Version 2.0  Date: Monday 22 October 2012 05:14:04 PM IST
+#
+$CMP 7402
+D Quad Nor2
+K TTL Nor2
+$ENDCMP
+#
+$CMP 74HC02
+D Quad Nor2
+K HCMOS Nor2
+$ENDCMP
+#
+$CMP 74HC04
+D Hex Inverseur
+K HCMOS not inv
+$ENDCMP
+#
+$CMP 74HC74
+D Dual D FlipFlop, Set & Reset
+K TTL DFF
+F 74xx/74hc_hct74.pdf
+$ENDCMP
+#
+$CMP 74HCT02
+D Quad Nor2
+K HCTMOS Nor2
+$ENDCMP
+#
+$CMP 74HCT04
+D Hex Inverseur
+K HCTMOS not inv
+$ENDCMP
+#
+$CMP 74LS02
+D Quad Nor2
+K TTL Nor2
+$ENDCMP
+#
+$CMP 74LS08
+D Quad And2
+K TTL and2
+$ENDCMP
+#
+$CMP 74LS09
+D Quad And2 Open Collect
+K TTL and2 OpenCol
+$ENDCMP
+#
+$CMP 74LS107
+D Double JK FlipFlop, reset
+K TTL JK
+$ENDCMP
+#
+$CMP 74LS109
+D Double JK FlipFlop, Set & Reset
+K TTL JK
+$ENDCMP
+#
+$CMP 74LS112
+D Double JK FlipFlop, Set & Reset
+K TTL JK
+$ENDCMP
+#
+$CMP 74LS114
+D Double JK, common Clock & Reset, Set
+K TTL JK
+$ENDCMP
+#
+$CMP 74LS14
+D Hex inverseur schmitt trigger
+K TTL not inv
+$ENDCMP
+#
+$CMP 74LS28
+D Quad Buffer Nor2
+K TTL Nor2 Buffer
+$ENDCMP
+#
+$CMP 74LS32
+D Quad Or 2 inputs
+K TTL Or2
+$ENDCMP
+#
+$CMP 74LS74
+D Dual D FlipFlop, Set & Reset
+K TTL DFF
+F 74xx/74hc_hct74.pdf
+$ENDCMP
+#
+$CMP 74LS86
+D Quad XOR 2 inputs
+K TTL XOR2
+F 74xx/74ls86.pdf
+$ENDCMP
+#
+#End Doc Library

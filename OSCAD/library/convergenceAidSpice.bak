@@ -1,0 +1,16 @@
+EESchema-LIBRARY Version 2.3  Date: Monday 10 December 2012 09:12:56 AM IST
+#encoding utf-8
+#
+# IC
+#
+DEF IC U? 0 0 Y N 1 F N
+F0 "U?" 0 270 30 H V C CNN
+F1 "IC" 0 230 30 H V C CNN
+DRAW
+X ic 1 0 0 0 U 20 20 0 0 P
+P 3 0 1 0  0 0  0 100  0 100 N
+P 5 0 1 0  0 100  -100 150  0 200  100 150  0 100 N
+ENDDRAW
+ENDDEF
+#
+#End Library

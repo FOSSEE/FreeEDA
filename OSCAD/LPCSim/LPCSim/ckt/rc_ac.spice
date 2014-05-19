@@ -1,0 +1,12 @@
+* AC Analysis
+V1 1 0 ac 1
+R1 1 2 100
+C1 2 0 1e-6
+.ac lin 10 100 10000
+
+.control
+run
+plot v(2)
+.endc
+.end
+

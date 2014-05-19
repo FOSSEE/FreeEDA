@@ -1,0 +1,52 @@
+Cmp-Mod V01 Created by CvPCB (2011-05-25)-stable date = Friday 28 September 2012 10:41:02 AM IST
+
+BeginCmp
+TimeStamp = /505C9F25;
+Reference = R1;
+ValeurCmp = 1000;
+IdModule  = R1;
+EndCmp
+
+BeginCmp
+TimeStamp = /50652FB6;
+Reference = R2;
+ValeurCmp = R;
+IdModule  = R1;
+EndCmp
+
+BeginCmp
+TimeStamp = /505FD8A0;
+Reference = U1;
+ValeurCmp = ADC;
+IdModule  = 1pin;
+EndCmp
+
+BeginCmp
+TimeStamp = /505FDE5C;
+Reference = U2;
+ValeurCmp = 74HC04;
+IdModule  = DIP-14__300_ELL;
+EndCmp
+
+BeginCmp
+TimeStamp = /505FDC21;
+Reference = U3;
+ValeurCmp = DAC;
+IdModule  = 1pin;
+EndCmp
+
+BeginCmp
+TimeStamp = /5061678B;
+Reference = U4;
+ValeurCmp = VPLOT1;
+IdModule  = 1pin;
+EndCmp
+
+BeginCmp
+TimeStamp = /505C9ECF;
+Reference = v1;
+ValeurCmp = PULSE;
+IdModule  = 2PIN_6mm;
+EndCmp
+
+EndListe
