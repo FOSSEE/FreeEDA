@@ -1112,7 +1112,7 @@ def convertICintoBasicBlocks(schematicInfo,outputOption):
         if reset_load=="": reset_load="1e-12"
         if rise_delay=="": rise_delay="1e-12"
         if fall_delay=="": fall_delay="1e-12"
-        schematicInfo.append(".model "+ compName+" d_srff(rise_delay="+rise_delay+" fall_delay="+fall_delay+" ic="+ic+"\n+sr_load="+sr_load+" clk_load="+clk_load+" set_load="+set_load+" reset_load="+reset_load+"\n+clk_delay="+enable_delay+" set_delay="+set_delay+" reset_delay="+reset_delay+")")
+        schematicInfo.append(".model "+ compName+" d_srff(rise_delay="+rise_delay+" fall_delay="+fall_delay+" ic="+ic+"\n+sr_load="+sr_load+" clk_load="+clk_load+" set_load="+set_load+" reset_load="+reset_load+"\n+clk_delay="+clk_delay+" set_delay="+set_delay+" reset_delay="+reset_delay+")")
       elif compType=="d_jkff":
         schematicInfo.append("a"+str(k)+" "+words[1]+" "+words[2]+" "+words[3]+" "+words[4]+" "+words[5]+" "+words[6]+" "+words[7]+" "+compName)
         k=k+1
