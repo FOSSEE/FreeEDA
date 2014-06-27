@@ -1392,7 +1392,15 @@ for eachline in schematicInfo:
     schematicInfo.insert(index,words[0]+" "+words[1]+" "+words[2]+" "+words[3]+" "+words[3]+" "+words[4]+" "+'M='+multiplicative_factor+" "+'L='+length+" "+'W='+width+" "+'PD='+str(PD)+" "+'PS='+str(PS)+" "+'AD='+str(AD)+" "+'AS='+str(AS))
     if modelName in modelList:
        continue
-    modelList.append(modelName)       
+    modelList.append(modelName)
+  elif eachline[0]=='j':
+    modelName=words[4]
+    index=schematicInfo.index(eachline)
+    schematicInfo.remove(eachline)
+    schematicInfo.insert(index,words[0]+" "+words[1]+" "+words[2]+" "+words[3]+" "+words[4])
+    if modelName in modelList:
+       continue
+    modelList.append(modelName)
   elif eachline[0]=='x':
     subcktName=words[len(words)-1]
     if subcktName in subcktList:
