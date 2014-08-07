@@ -10,5 +10,9 @@ echo -n "Installing "
 echo -n $1 
 echo "................."
  sudo apt-get install $1
-
-
+ if [ $? -ne 1 ]
+ then 
+     echo 0 > pypkgExitStatus
+ else
+     echo 1 > pypkgExitStatus
+ fi

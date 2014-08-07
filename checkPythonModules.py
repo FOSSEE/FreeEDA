@@ -23,15 +23,30 @@ def checkPackage(package):
       time.sleep(2)
     except ImportError:
       pass
-    try:
+
+    ############################# changes made by Amardeepsingh 12/6/2014 - 7pm
+    with open (os.getcwd()+"/pypkgExitStatus") as f2:
+        lines = f2.read()
+
+    lines = lines.split("\n")
+    if lines[0] != '0':	
+      print "Unable to find "+packageName
+      print "Please re-run the ./installOSCAD.sh If you are getting this error first time"
+      print '\033[91m'+ "  Please Install Python Library: " + libraryName + " using package manager"+ '\033[0m' 
+      exit(1)
+
+    #############################
+
+
+    '''try:
       __import__(packageName)
     except ImportError:
       print "Unable to find "+packageName
       print "Please re-run the ./installOSCAD.sh If you are getting this error first time"
       print '\033[91m'+ "  Please Install Python Library: " + libraryName + " using package manager"+ '\033[0m' 
-      exit(1)
+      exit(1)'''
   print "  Found python module: " +packageName
 
-packageList=[["wx","python-wxgtk2.8 wx-common"],["re","re"],["Image","python-imaging"],["ImageTk","python-imaging-tk"],["string","string"],["Tkinter","python-tk"],["Pmw","python-pmw"]]
+packageList=[["wx","python-wxgtk2.8 wx-common"],["re","re"],["Image","python-imaging"],["ImageTk","python-imaging-tk"],["string","string"],["Tkinter","python-tk"],["Pmw","python-pmw"],["PyQt4","python-qt4"],["matplotlib","python-matplotlib"]]
 for package in packageList:
   checkPackage(package)

@@ -1,5 +1,5 @@
 #!/bin/bash
-
+#
 # installOSCAD.sh is a part of OSCAD.
 # Original Author: Yogesh Dilip Save (yogessave@gmail.com)
 # Copyright (C) 2012 Yogesh Dilip Save, FOSS Project, IIT Bombay.
@@ -248,6 +248,13 @@ else
   fi
 fi
 echo "Installation started..............."
+
+if [ -d $installDir/OSCAD ]
+then
+echo "Renaming your old OSCAD folder to OSCAD.bak"
+mv -r $installDir/OSCAD $installDir/OSCAD.bak
+fi
+echo "Outof if loop"
 
 #tar -zxvf OSCAD.tar.gz -C $installDir
 cp -rv OSCAD $installDir
