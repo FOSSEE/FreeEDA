@@ -1,432 +1,691 @@
+#!/usr/bin/python
+# KicadtoNgspice.py is a python script to convert a Kicad spice netlist to a ngspice netlist. It developed for OSCAD software. It is written by Yogesh Dilip Save (yogessave@gmail.com).  
+# Copyright (C) 2012 Yogesh Dilip Save, FOSS Project, IIT Bombay.
+# This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
 import sys
 import os.path
-from PyQt4 import QtGui,QtCore
-from PyQt4.QtGui import *
-from random import choice
+import tkMessageBox
+from setPath import OSCAD_HOME
+from Tkinter import *
 
-class NewWindow(QtGui.QWidget):
-  def __init__(self):
-    QWidget.__init__(self)
-    self.horizontalLayout = QtGui.QVBoxLayout(self)
-    self.scrollArea = QtGui.QScrollArea(self)
-    self.scrollArea.setWidgetResizable(True)
-    self.scrollAreaWidgetContents = QtGui.QWidget()
-    self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 100, 100))
-    self.horizontalLayout_2 = QtGui.QHBoxLayout(self.scrollAreaWidgetContents)
-    self.grid = QtGui.QGridLayout()
-    self.horizontalLayout_2.addLayout(self.grid)
-    self.scrollArea.setWidget(self.scrollAreaWidgetContents)
-    self.SubmitButton = QtGui.QPushButton("Submit and Exit")
-    self.ClearButton= QtGui.QPushButton("Clear Button")
-    self.BackButton= QtGui.QPushButton("Back Button")
-    self.horizontalLayout.addWidget(self.scrollArea)
-    self.horizontalLayout.addWidget(self.BackButton)
-    self.horizontalLayout.addWidget(self.ClearButton)
-    self.horizontalLayout.addWidget(self.SubmitButton)
-    self.SubmitButton.clicked.connect(self.Submit)
-    self.ClearButton.clicked.connect(self.ClearModelParamValue)
-    self.BackButton.clicked.connect(self.BackAgain)
-    self.setGeometry(0,0,700, 400)
-    self.center()
-     
-  def ClearModelParamValue(self):
-    for line in  guimodellisttrack:
-        #print "line",line
-        start=line[5]
-        end=line[6]
-        count=start
-        for item in range(end-start+1):
-            nextentry_var[count].setText("")
-            count=count+1
-
-  def BackAgain(self):
-    firstwindow=1
-    w.show()
-    nw.close()
-
-  def Submit(self):
+def readNetlist(filename):
+  """Read Pspice netList"""
+# Open file if it exists
+  if os.path.exists(filename):
     try:
-        AddModelParametr()      #Adding Model Parameter
-        for item in modelparamvalue:
-            schematicInfo.append(item[2])  #Adding Comment line
-            schematicInfo.append(item[1])  #Adding Model line
-        print "Successfully Closed"
-	#print "SchematicInfo"
-	#print SchematicInfo
-        self.close()
-    except:
-        QMessageBox.about(self,"Exception","Please Add before Submit")
-    create_ngspice_netlist()
+      f = open(filename)
+    except :
+      print("Error in opening file")
+      sys.exit()
+  else:
+    print filename + " does not exist"
+    sys.exit()
+  
+# Read the data from file
+  data=f.read()
+  
+# Close the file
+  f.close()
+  return data.splitlines()
 
-  def center(self):
-    qr=self.frameGeometry()
-    cp = QtGui.QDesktopWidget().availableGeometry().center()
-    qr.moveCenter(cp)
-    self.move(qr.topLeft())    
+def readParamInfo(data):
+  """Read Parameter information and store it into dictionary"""
+  param={}
+  for eachline in lines:
+    eachline=eachline.strip()
+    if len(eachline)>1:
+      words=eachline.split();
+      option=words[0].lower()
+      if option=='.param':
+	for i in range(1, len(words), 1):
+	  paramList=words[i].split('=')
+	  param[paramList[0]]=paramList[1]
+  return param
 
-class Window(QtGui.QWidget):
-  def __init__(self):
-    super(Window,self).__init__()
-  def createrootwindow(self,sourcelist,sourcelisttrack):
-    self.backClicked=0  
-    global nextrow
-    self.nextrow=0
-    self.horizontalLayout = QtGui.QVBoxLayout(self)
-    self.scrollArea = QtGui.QScrollArea(self)
-    self.scrollArea.setWidgetResizable(True)
-    self.scrollAreaWidgetContents = QtGui.QWidget()
-    self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 100, 100))
-    self.horizontalLayout_2 = QtGui.QHBoxLayout(self.scrollAreaWidgetContents)
-    self.grid = QtGui.QGridLayout()
-    self.horizontalLayout_2.addLayout(self.grid)
-    self.scrollArea.setWidget(self.scrollAreaWidgetContents)
-    self.Nextbutton = QtGui.QPushButton("Next Button")
-    self.Clearbutton= QtGui.QPushButton("Clear Button")
-    self.horizontalLayout.addWidget(self.scrollArea)
-    self.horizontalLayout.addWidget(self.Nextbutton)
-    self.horizontalLayout.addWidget(self.Clearbutton)
-    self.setGeometry(0,0,700, 400)	
-    self.show()
-    self.Nextbutton.clicked.connect(self.NextPage)
-    self.Clearbutton.clicked.connect(self.ClearSourceValue)
-    self.center()
-    global count
+def preprocessNetlist(lines,param):
+  """Preprocess netlist (replace parameters)"""
+  netlist=[]
+  for eachline in lines:
+  # Remove leading and trailing blanks spaces from line 
+    eachline=eachline.strip()
+  # Remove special character $
+    eachline=eachline.replace('$','')
+  # Replace parameter with values
+    for subParam in eachline.split():
+      if '}' in subParam:
+	key=subParam.split()[0]
+	key=key.strip('{')
+	key=key.strip('}')
+	if key in param:
+	  eachline=eachline.replace('{'+key+'}',param[key])
+	else:
+	  print "Parameter " + key +" does not exists"
+	  value=raw_input('Enter parameter value: ')
+	  eachline=eachline.replace('{'+key+'}',value)
+   # Convert netlist into lower case letter	
+    eachline=eachline.lower()
+   # Construct netlist
+    if len(eachline)>1:
+      if eachline[0]=='+':
+	netlist.append(netlist.pop()+eachline.replace('+',' '))
+      else:
+	netlist.append(eachline) 
+ # Copy information line
+  infoline=netlist[0]
+  netlist.remove(netlist[0])			
+  return netlist,infoline
+
+def separateNetlistInfo(netlist):
+  optionInfo=[]
+  schematicInfo=[]
+  
+  for eachline in netlist:
+    if eachline[0]=='*':
+      continue
+    elif eachline[0]=='.':
+      optionInfo.append(eachline)
+    else:
+      schematicInfo.append(eachline)
+  return optionInfo,schematicInfo
+
+
+def addAnalysis(optionInfo):
+  """Open file if it exists"""
+  filename="analysis"
+  if os.path.exists(filename):
+    try:
+      f = open(filename)
+    except :
+      print("Error in opening file")
+      sys.exit()
+  else:
+    print filename + " does not exist"
+    sys.exit()
+
+# Read the data from file
+  data=f.read()
+  
+# Close the file
+  f.close()
+
+  analysisData=data.splitlines()
+  for eachline in analysisData:
+    eachline=eachline.strip()
+    if len(eachline)>1:
+      if eachline[0]=='.':
+        optionInfo.append(eachline)
+      else:
+        pass
+  return optionInfo
+
+def findCurrent(schematicInfo,outputOption):
+  #Find current through component by placing voltage source series with the component
+  i=0
+  for eachline in outputOption:
+    words=eachline.split()
+    option=words[0]
+  # Add voltage sources in series with component to find current 
+    if option=="print" or option=="plot":
+      words.remove(option)
+      updatedline=eachline
+      for outputVar in words:
+      # Find component name if output variable is current
+	if outputVar[0]=='i':
+	  outputVar=outputVar.strip('i')
+	  outputVar=outputVar.strip('(')
+	  compName=outputVar.strip(')')
+	 # If component is voltage source, skip
+	  if compName[0]=='v':
+	    continue
+	 # Find the component from the circuit
+	  for compline in schematicInfo:
+	    compInfo=compline.split()
+	    if compInfo[0]==compName:
+	    # Construct dummy node 
+	      dummyNode='dummy_'+str(i)
+	      i+=1
+	    # Break the one node component and place zero value voltage source in between.
+	      index=schematicInfo.index(compline)
+	      schematicInfo.remove(compline)
+	      compline=compline.replace(compInfo[2],dummyNode)
+	      schematicInfo.insert(index,compline)
+	      schematicInfo.append('v'+compName+' '+dummyNode+' '+compInfo[2]+' 0')
+    # Update option information
+	  updatedline=updatedline.replace('i('+compName+')','i(v'+compName+')')
+      index=outputOption.index(eachline)
+      outputOption.remove(eachline)
+      outputOption.insert(index,updatedline) 
+  return schematicInfo, outputOption
+
+def insertSpecialSourceParam(schematicInfo,sourcelist):
+  #Inser Special source parameter
+  schematicInfo1=[]
+  
+  for compline in schematicInfo:
+    words=compline.split()
+    compName=words[0]
+  # Ask for parameters of source
+    if compName[0]=='v' or compName=='i':
+    # Find the index component from circuit
+      index=schematicInfo.index(compline)
+      #schematicInfo.remove(compline)
+      if words[3]=="pulse":
+	Title="Add parameters for pulse source "+compName
+	v1='  Enter initial value(Volts/Amps): '
+	v2='  Enter pulsed value(Volts/Amps): '
+	td='  Enter delay time (seconds): '
+	tr='  Enter rise time (seconds): '
+	tf='  Enter fall time (seconds): '
+	pw='  Enter pulse width (seconds): '
+	tp='  Enter period (seconds): '
+	sourcelist.append([index,compline,words[3],Title,v1,v2,td,tr,tf,pw,tp])
+      
+      elif words[3]=="sine":
+	Title="Add parameters for sine source "+compName
+	vo='  Enter offset value (Volts/Amps): '
+	va='  Enter amplitude (Volts/Amps): '
+	freq='  Enter frequency (Hz): '
+	td='  Enter delay time (seconds): '
+	theta='  Enter damping factor (1/seconds): '
+	sourcelist.append([index,compline,words[3],Title,vo,va,freq,td,theta])
+	
+      elif words[3]=="pwl":
+        Title="Add parameters for pwl source"+compName
+        t_v=' Enter in pwl format without bracket i.e t1 v1 t2 v2.... '
+	sourcelist.append([index,compline,words[3],Title,t_v])   
+	
+      elif words[3]=="ac":
+	Title="Add parameters for ac source "+compName
+	v_a='  Enter amplitude (Volts/Amps): '	  		 	 	   	
+	sourcelist.append([index,compline,words[3],Title,v_a])
+
+      elif words[3]=="exp":
+	Title="Add parameters for exponential source "+compName
+	v1='  Enter initial value(Volts/Amps): '
+	v2='  Enter pulsed value(Volts/Amps): '
+	td1='  Enter rise delay time (seconds): '
+	tau1='  Enter rise time constant (seconds): '
+	td2='  Enter fall time (seconds): '
+	tau2='  Enter fall time constant (seconds): '
+	sourcelist.append([index,compline,words[3],Title,v1,v2,td1,tau1,td2,tau2])
+
+      elif words[3]=="dc":
+	Title="Add parameters for DC source "+compName
+	v1='  Enter value(Volts/Amps): '
+	v2='  Enter zero frequency: '
+	sourcelist.append([index,compline,words[3],Title,v1,v2])
+      #schematicInfo.insert(index,compline)
+      	
+    elif compName[0]=='h' or compName[0]=='f':
+    # Find the index component from the circuit
+      index=schematicInfo.index(compline)
+      schematicInfo.remove(compline)
+      schematicInfo.insert(index,"* "+compName)
+      schematicInfo1.append("V"+compName+" "+words[3]+" "+words[4]+" 0")
+      schematicInfo1.append(compName+" "+words[1]+" "+words[2]+" "+"V"+compName+" "+words[5])
+  schematicInfo=schematicInfo+schematicInfo1
+  print sourcelist
+  print schematicInfo
+  return schematicInfo,sourcelist	
+        	
+
+def createrootwindow(sourcelist,sourcelisttrack):
+	global frame
+	global canvas
+	global root_window	
+	global window_height
+	global window_width	
+	root_window=Tk()
+	window_width=700
+	window_height=500
+	canvas=Canvas(root_window,bg='#FFFFFF',width=window_width,height=window_height,scrollregion=(0,0,800,800))
+        hbar=Scrollbar(root_window,orient=HORIZONTAL)
+        hbar.pack(side=BOTTOM,fill=X)
+        hbar.config(command=canvas.xview)
+        vbar=Scrollbar(root_window,orient=VERTICAL)
+        vbar.pack(side=RIGHT,fill=Y)
+        vbar.config(command=canvas.yview)
+        canvas.config(width=window_width,height=window_height)
+    	canvas.config(xscrollcommand=hbar.set, yscrollcommand=vbar.set)
+    	canvas.pack(side=LEFT,expand=True,fill=BOTH)
+    	# make the canvas expandable
+    	root_window.grid_rowconfigure(0, weight=1)
+    	root_window.grid_columnconfigure(0, weight=1)
+	frame=Frame(canvas,height=window_height,width=window_width)
+	buttonframe=Frame(frame)
+	#Addbutton=Button(buttonframe,text='Add',command=AddSourceValue)
+	Nextbutton=Button(buttonframe,text='Next',command=NextPage)
+        Clearbutton=Button(buttonframe,text='Clear',command=ClearSourceValue)
+	global count
+	count=0
+	global entry_var
+	entry_var={}
+        ##Checking if source is present"
+        if sourcelist:       
+          for line in sourcelist:
+	    print "Voltage source line index: ",line[0]
+	    print "SourceList line Test: ",line	
+	    track_id=line[0]
+	    if line[2]=='sine':
+	       entry_var[count]=StringVar()
+	       label=Label(frame,text=line[3],font=('Times', 15),anchor=CENTER,bg="Red")
+	       label.grid(row=count,column=1,ipadx=5,ipady=5,padx=5,pady=5)
+	       count=count+1
+	       start=count
+ 	       entry_var[count]=StringVar()		
+	       label=Label(frame,text=line[4])
+	       label.grid(row=count,sticky=W+E+N+S,padx=5,pady=5)
+	       entry=Entry(frame,width=10,textvariable=entry_var[count])
+	       entry.grid(row=count,column=1,sticky=W+E+N+S,padx=5,pady=5)  
+	       count=count+1
+               entry_var[count]=StringVar()
+	       label=Label(frame,text=line[5])
+	       label.grid(row=count,sticky=W+E+N+S,padx=5,pady=5)	
+	       entry=Entry(frame,width=10,textvariable=entry_var[count])
+	       entry.grid(row=count,column=1,sticky=W+E+N+S,padx=5,pady=5)  
+	       count=count+1
+               entry_var[count]=StringVar()
+	       label=Label(frame,text=line[6])
+	       label.grid(row=count,sticky=W+E+N+S,padx=5,pady=5)	
+	       entry=Entry(frame,width=10,textvariable=entry_var[count])
+	       entry.grid(row=count,column=1,sticky=W+E+N+S,padx=5,pady=5)  
+	       count=count+1
+	       entry_var[count]=StringVar()
+	       label=Label(frame,text=line[7])
+	       label.grid(row=count,sticky=W+E+N+S,padx=5,pady=5)	
+	       entry=Entry(frame,width=10,textvariable=entry_var[count])
+	       entry.grid(row=count,column=1,sticky=W+E+N+S,padx=5,pady=5)  
+	       count=count+1
+               entry_var[count]=StringVar()
+	       label=Label(frame,text=line[8])
+	       label.grid(row=count,sticky=W+E+N+S,padx=5,pady=5)	
+	       entry=Entry(frame,width=10,textvariable=entry_var[count])
+	       entry.grid(row=count,column=1,sticky=W+E+N+S,padx=5,pady=5)  
+	       end=count
+	       count=count+1
+	       sourcelisttrack.append([track_id,'sine',start,end])	
+	
+	    elif line[2]=='pulse':
+	       entry_var[count]=StringVar()
+	       label=Label(frame,text=line[3],font=('Times', 15),anchor=CENTER,bg="Red")
+	       label.grid(row=count,column=1,ipadx=5,ipady=5,padx=5,pady=5)
+	       count=count+1
+	       entry_var[count]=StringVar()
+	       start=count			
+	       label=Label(frame,text=line[4])
+	       label.grid(row=count,sticky=W+E+N+S,padx=5,pady=5)	
+	       entry=Entry(frame,width=10,textvariable=entry_var[count])
+	       entry.grid(row=count,column=1,sticky=W+E+N+S,padx=5,pady=5)  
+	       count=count+1
+	       entry_var[count]=StringVar()
+	       label=Label(frame,text=line[5])
+	       label.grid(row=count,sticky=W+E+N+S,padx=5,pady=5)	
+	       entry=Entry(frame,width=10,textvariable=entry_var[count])
+	       entry.grid(row=count,column=1,sticky=W+E+N+S,padx=5,pady=5)  
+	       count=count+1
+	       entry_var[count]=StringVar()	
+	       label=Label(frame,text=line[6])
+	       label.grid(row=count,sticky=W+E+N+S,padx=5,pady=5)	
+	       entry=Entry(frame,width=10,textvariable=entry_var[count])
+	       entry.grid(row=count,column=1,sticky=W+E+N+S,padx=5,pady=5)  
+	       count=count+1
+	       entry_var[count]=StringVar() 
+	       label=Label(frame,text=line[7])
+	       label.grid(row=count,sticky=W+E+N+S,padx=5,pady=5)	
+	       entry=Entry(frame,width=10,textvariable=entry_var[count])
+	       entry.grid(row=count,column=1,sticky=W+E+N+S,padx=5,pady=5)  
+	       count=count+1
+	       entry_var[count]=StringVar()
+	       label=Label(frame,text=line[8])
+	       label.grid(row=count,sticky=W+E+N+S,padx=5,pady=5)	
+	       entry=Entry(frame,width=10,textvariable=entry_var[count])
+	       entry.grid(row=count,column=1,sticky=W+E+N+S,padx=5,pady=5)  
+	       count=count+1
+	       entry_var[count]=StringVar() 	
+	       label=Label(frame,text=line[9])
+	       label.grid(row=count,sticky=W+E+N+S,padx=5,pady=5)	
+	       entry=Entry(frame,width=10,textvariable=entry_var[count])
+	       entry.grid(row=count,column=1,sticky=W+E+N+S,padx=5,pady=5)  
+	       count=count+1
+	       entry_var[count]=StringVar()
+	       label=Label(frame,text=line[10])
+	       label.grid(row=count,sticky=W+E+N+S,padx=5,pady=5)	
+	       entry=Entry(frame,width=10,textvariable=entry_var[count])
+	       entry.grid(row=count,column=1,sticky=W+E+N+S,padx=5,pady=5)  
+	       end=count
+	       count=count+1
+	       sourcelisttrack.append([track_id,'pulse',start,end])
+
+	    elif line[2]=='pwl':
+               entry_var[count]=StringVar()
+               label=Label(frame,text=line[3],font=('Times',15),anchor=CENTER,bg="Red")
+               label.grid(row=count,column=1,ipadx=5,ipady=5,padx=5,pady=5)
+	       count=count+1
+	       entry_var[count]=StringVar()
+               start=count
+	       label=Label(frame,text=line[4])
+	       label.grid(row=count,sticky=W+E+N+S,padx=5,pady=5)
+	       entry=Entry(frame,width=10,textvariable=entry_var[count])
+	       entry.grid(row=count,column=1,sticky=W+E+N+S,padx=5,pady=5)  
+	       end=count
+	       count=count+1
+	       sourcelisttrack.append([track_id,'pwl',start,end])	
+	        				
+	       	
+	    elif line[2]=='ac':
+	       entry_var[count]=StringVar()
+	       label=Label(frame,text=line[3],font=('Times', 15),anchor=CENTER,bg="Red")
+	       label.grid(row=count,column=1,ipadx=5,ipady=5,padx=5,pady=5)
+	       count=count+1
+               entry_var[count]=StringVar() 
+	       start=count			
+	       label=Label(frame,text=line[4])
+	       label.grid(row=count,sticky=W+E+N+S,padx=5,pady=5)
+	       entry=Entry(frame,width=10,textvariable=entry_var[count])
+	       entry.grid(row=count,column=1,sticky=W+E+N+S,padx=5,pady=5)  
+	       end=count
+	       count=count+1
+	       sourcelisttrack.append([track_id,'ac',start,end])	 
+	   
+	    elif line[2]=='dc':
+	       entry_var[count]=StringVar()
+               label=Label(frame,text=line[3],font=('Times', 15),anchor=CENTER,bg="Red")
+	       label.grid(row=count,column=1,ipadx=5,ipady=5,padx=5,pady=5)
+	       count=count+1
+	       entry_var[count]=StringVar()
+	       start=count		
+	       label=Label(frame,text=line[4])
+	       label.grid(row=count,sticky=W+E+N+S,padx=5,pady=5)	
+	       entry=Entry(frame,width=10,textvariable=entry_var[count])
+	       entry.grid(row=count,column=1,sticky=W+E+N+S,padx=5,pady=5)  
+	       end=count
+	       count=count+1
+               sourcelisttrack.append([track_id,'dc',start,end]) 		
+	
+	    elif line[2]=='exp':
+	       entry_var[count]=StringVar()
+               label=Label(frame,text=line[3],font=('Times', 15),anchor=CENTER,bg="Red")
+	       label.grid(row=count,column=1,ipadx=5,ipady=5,padx=5,pady=5)
+	       count=count+1
+	       entry_var[count]=StringVar()
+	       start=count 		
+	       label=Label(frame,text=line[4])
+	       label.grid(row=count,sticky=W+E+N+S,padx=5,pady=5)	
+	       entry=Entry(frame,width=10,textvariable=entry_var[count])
+	       entry.grid(row=count,column=1,sticky=W+E+N+S,padx=5,pady=5)  
+	       count=count+1
+	       entry_var[count]=StringVar()
+	       label=Label(frame,text=line[5])
+	       label.grid(row=count,sticky=W+E+N+S,padx=5,pady=5)	
+	       entry=Entry(frame,width=10,textvariable=entry_var[count])
+	       entry.grid(row=count,column=1,sticky=W+E+N+S,padx=5,pady=5)  
+	       count=count+1
+	       entry_var[count]=StringVar()
+	       label=Label(frame,text=line[6])
+	       label.grid(row=count,sticky=W+E+N+S,padx=5,pady=5)	
+	       entry=Entry(frame,width=10,textvariable=entry_var[count])
+	       entry.grid(row=count,column=1,sticky=W+E+N+S,padx=5,pady=5)  
+	       count=count+1
+               entry_var[count]=StringVar()
+	       label=Label(frame,text=line[7])
+	       label.grid(row=count,sticky=W+E+N+S,padx=5,pady=5)	
+	       entry=Entry(frame,width=10,textvariable=entry_var[count])
+	       entry.grid(row=count,column=1,sticky=W+E+N+S,padx=5,pady=5)  
+	       count=count+1
+	       entry_var[count]=StringVar()
+	       label=Label(frame,text=line[8])
+	       label.grid(row=count,sticky=W+E+N+S,padx=5,pady=5)	
+	       entry=Entry(frame,width=10,textvariable=entry_var[count])
+	       entry.grid(row=count,column=1,sticky=W+E+N+S,padx=5,pady=5)  
+	       count=count+1
+	       entry_var[count]=StringVar()
+	       label=Label(frame,text=line[9])
+	       label.grid(row=count,sticky=W+E+N+S,padx=5,pady=5)	
+	       entry=Entry(frame,width=10,textvariable=entry_var[count])
+	       entry.grid(row=count,column=1,sticky=W+E+N+S,padx=5,pady=5)  
+	       end=count
+	       count=count+1
+	       sourcelisttrack.append([track_id,'exp',start,end])		
+        else:
+	    print "No source is present in your circuit"
+	    tkMessageBox.showinfo("Source List Info","There is no source in your circuit,Please click next button")
+		    
+
+        frame.grid()
+        buttonframe.grid()
+	#Addbutton.grid(row=count,column=1,padx=5,pady=5)
+	Nextbutton.grid(row=count,column=2,padx=5,pady=5)
+        Clearbutton.grid(row=count,column=3,padx=5,pady=5)
+	canvas.create_window(0, 0, anchor=NW, window=frame)
+    	frame.update_idletasks()
+    	canvas.config(scrollregion=canvas.bbox("all"))
+	#frame.mainloop()
+        root_window.title("Add Source and Model Parameter")
+	root_window.mainloop()
+        return sourcelist,sourcelisttrack
+
+	
+
+def AddSourceValue():
+    print "Add Source Value"
+    global sourcelistvalue
+    sourcelistvalue=[]	
     global start
     global end
-    count=1
-    global row
-    row=0
-    global entry_var
-    entry_var={}
-    if sourcelist:
-       for line in sourcelist:
-          #print "Voltage source line index: ",line[0]
-          #print "SourceList line Test: ",line
-          track_id=line[0]
-	  print "track_id is ",track_id
- 	     
-          if line[2]=='ac':
-             label=QLabel(line[3])
-	     self.grid.addWidget(label,row,1)
-             row=row+1
-             start=count
-             label=QLabel(line[4])
-	     self.grid.addWidget(label,row,0)
-	     entry_var[count]=QLineEdit()
-	     self.grid.addWidget(entry_var[count],row,1)
-	     value=present_already(line[1],line[2])
-	     if value == 0:
-		     entry_var[count].setText("")
-	     else:
-		     entry_var[count].setText(store_ans)			      
-             row=row+1
-             end=count
-             count=count+1
-	     sourcelisttrack.append([track_id,'ac',start,end])
-	  elif line[2]=='dc':
-	     label=QLabel(line[3])
-             self.grid.addWidget(label,row,1)
-             row=row+1
-             start=count
-             label=QLabel(line[4])
-             self.grid.addWidget(label,row,0)
-             entry_var[count]=QLineEdit()
-             self.grid.addWidget(entry_var[count],row,1)
-	     value=present_already(line[1],line[2])
-	     if value == 0:
-		     entry_var[count].setText("")
-	     else:
-		     entry_var[count].setText(store_ans)
-             row=row+1
-             end=count
-             count=count+1
-             sourcelisttrack.append([track_id,'dc',start,end])
-	  elif line[2]=='sine':
-             label=QLabel(line[3])
-	     self.grid.addWidget(label,row,1)
-	     row=row+1
-	     start=count
-	     value=present_already(line[1],line[2])
-	     indi=0
-	     for it in range(4,9):
-               label=QLabel(line[it])
-	       self.grid.addWidget(label,row,0)
-	       entry_var[count]=QLineEdit()
-	       self.grid.addWidget(entry_var[count],row,1)
-	       if value !=0:
-		       store_ans_list=store_ans.split()
-		       ans_list_size=len(store_ans_list)
-	       if value==0 or indi >= ans_list_size :
-		       entry_var[count].setText("")     
-	       else:
-		       entry_var[count].setText(str(store_ans_list[indi]))
-		       indi=indi+1	              
-	       row=row+1
-	       count=count+1  
-
-
-             end=count-1
-	     sourcelisttrack.append([track_id,'sine',start,end])
-	  elif line[2]=='pulse':
-	     label=QLabel(line[3])
-             self.grid.addWidget(label,row,1)
-             row=row+1
-             start=count
-	     value=present_already(line[1],line[2])
-	     indi=0;
-             for it in range(4,11):
-               label=QLabel(line[it])
-               self.grid.addWidget(label,row,0)
-               entry_var[count]=QLineEdit()
-               self.grid.addWidget(entry_var[count],row,1)
-	       if value!=0:
-		       store_ans_list=store_ans.split()
-		       ans_list_size=len(store_ans_list)
-	       if value==0 or indi >= ans_list_size:
-		       entry_var[count].setText("")
-	       else:
-		       entry_var[count].setText(str(store_ans_list[indi]))
-		       indi=indi+1
-               row=row+1
-               count=count+1
-	     end=count-1
-             sourcelisttrack.append([track_id,'pulse',start,end])
-	  elif line[2]=='pwl':
-	     label=QLabel(line[3])
-             self.grid.addWidget(label,row,1)
-             row=row+1
-             start=count
-	     label=QLabel(line[4])
-	     self.grid.addWidget(label,row,0)
-             entry_var[count]=QLineEdit()
-             self.grid.addWidget(entry_var[count],row,1)
-	     value=present_already(line[1],line[2])
-	     if value==0:
-		     entry_var[count].setText("");
-	     else:
-		     entry_var[count].setText(str(store_ans))
-             row=row+1
-	     end=count
-             count=count+1
-	     sourcelisttrack.append([track_id,'pwl',start,end])
-	  elif line[2]=='exp':
-             label=QLabel(line[3])
-             self.grid.addWidget(label,row,1)
-             row=row+1
-             start=count
-	     indi=0
-	     value=present_already(line[1],line[2])
-             for it in range(4,10):
-               label=QLabel(line[it])
-               self.grid.addWidget(label,row,0)
-               entry_var[count]=QLineEdit()
-               self.grid.addWidget(entry_var[count],row,1)
-	       if value != 0:
-		       store_ans_list=store_ans.split()
-		       ans_list_size=len(store_ans_list)
-	       if value == 0 or indi >= ans_list_size:
-		       entry_var[count].setText("")
-	       else:
-		       entry_var[count].setText(str(store_ans_list[indi]))
-		       indi=indi+1
+    start=0
+    end=0
+    print "Track Source List :",sourcelisttrack
+    print "Initial Source List Value :",sourcelistvalue	
+    for compline in sourcelisttrack:
+	index=compline[0]
+	addline=schematicInfo[index]
 	
-               row=row+1
-               count=count+1
-             end=count-1
-             sourcelisttrack.append([track_id,'exp',start,end])
-          count=count+1  
-          #print "startcount ",start
-          #print "endcount ",end 
-    else:
-       print "No source is present in your circuit"
-       
+	if compline[1]=='sine':	
+	   try:
+	      start=compline[2]
+	      end=compline[3]
+	      vo_val=entry_var[start].get()
+	      va_val=entry_var[start+1].get()
+	      freq_val=entry_var[start+2].get()
+	      td_val=entry_var[start+3].get()
+	      theta_val=entry_var[end].get()
+	      addline=addline.partition('(')[0] + "("+vo_val+" "+va_val+" "+freq_val+" "+td_val+" "+theta_val+")"
+	      print "Line Added ",addline
+	      sourcelistvalue.append([index,addline])
+           except:
+              print "Caught an exception in sine voltage source ",addline  
+	     
+	elif compline[1]=='pulse':
+	   try:
+	      start=compline[2]
+	      end=compline[3]
+	      v1_val=entry_var[start].get()
+	      v2_val=entry_var[start+1].get()
+	      td_val=entry_var[start+2].get()
+	      tr_val=entry_var[start+3].get()
+	      tf_val=entry_var[start+4].get()
+	      pw_val=entry_var[start+5].get()
+	      tp_val=entry_var[end].get() 	
+	      addline=addline.partition('(')[0] + "("+v1_val+" "+v2_val+" "+td_val+" "+tr_val+" "+tf_val+" "+pw_val+" "+tp_val+")"
+	      print "Line Added ",addline
+	      sourcelistvalue.append([index,addline])
+           except:
+	      print "Caught an exception in pulse voltage source ",addline
+
+        elif compline[1]=='pwl':
+	   try:
+	     start=compline[2]
+	     t_v_val=entry_var[start].get()
+	     addline=addline.partition('(')[0] + "("+t_v_val+")"
+	     print "Line Added ",addline
+	     sourcelistvalue.append([index,addline])
+	   except:
+	     print "Caught an exception in pwl voltage source ",addline 
+               
+	elif compline[1]=='ac':
+           try:
+	      start=compline[2]
+              va_val=entry_var[start].get()
+              addline=' '.join(addline.split())
+              addline=addline.partition('ac')[0] +" "+'ac'+" "+ va_val
+	      print "Line Added ",addline
+	      sourcelistvalue.append([index,addline]) 
+           except:
+	      print "Caught an exception in ac voltage source ",addline
+              
+	elif compline[1]=='dc':
+	   try:
+	      start=compline[2]
+	      v1_val=entry_var[start].get()
+	      addline=' '.join(addline.split())	
+	      addline=addline.partition('dc')[0] + " " +'dc'+ " "+v1_val
+	      print "Line Added ",addline
+	      sourcelistvalue.append([index,addline]) 
+           except:
+	      print "Caught an exception in dc voltage source",addline 
+            
+        elif compline[1]=='exp':
+	   try:
+	      start=compline[2]
+	      end=compline[3]
+	      v1_val=entry_var[start].get()
+	      v2_val=entry_var[start+1].get()
+	      td1_val=entry_var[start+2].get()
+	      tau1_val=entry_var[start+3].get()
+	      td2_val=entry_var[start+4].get()
+	      tau2_val=entry_var[end].get()		
+	      addline=addline.partition('(')[0] + "("+v1_val+" "+v2_val+" "+td1_val+" "+tau1_val+" "+td2_val+" "+tau2_val+")"
+	      print "Line Added ",addline
+	      sourcelistvalue.append([index,addline])
+           except:
+              print "Caught an exception in exp voltage source ",addline
+    print "Final Source List Value :",sourcelistvalue
+    ##Adding into schematicInfo
+    for item in sourcelistvalue:
+	del schematicInfo[item[0]]
+	schematicInfo.insert(item[0],item[1])
 
 
-    return sourcelist,sourcelisttrack
-  
-  def closeEvent(self,event):
-    print "window closed"
-    
-  def NextPage(self):
-    #print "next page"
+   
+def NextPage():
+    print "Next Page"
     AddSourceValue()
-    w.close()
-    nw.show()
-    firstwindow=0   
-    self.backClicked+=1
+    ##Destroying Frame
+    frame.destroy()
+    #frame.grid_forget()
     global schematicInfo
     global outputOption
     global guimodelvalue
     global guimodellisttrack
     global guimodellist
-    if self.backClicked==1:
-    	guimodelvalue=[]
-    	outputOption=[]  #check whether it affects the working
-    	guimodellisttrack=[]
+    guimodelvalue=[]	
+    guimodellisttrack=[]
     guimodellist=['adc8','dac8','gain','summer','multiplier','divider','limit','integrator','differentiator','limit8','controlledlimiter',
 'analogswitch','zener','d_buffer','d_inverter','d_and','d_nand','d_or','d_nor','d_xor','d_xnor','d_tristate','d_pullup',
-'d_pulldown','d_srlatch','d_jklatch','d_dlatch','d_tlatch','d_srff','d_jkff','d_dff','ic','transfo']
-    ##Calling function which take information for entry and label    
-    if self.backClicked==1:           
-    	schematicInfo,outputOption,guimodelvalue=convertICintoBasicBlocks(schematicInfo,outputOption,guimodelvalue)
+'d_pulldown','d_srlatch','d_jklatch','d_dlatch','d_tlatch','d_srff','d_jkff','d_dff','ic']	
     
-    #print "Info is",schematicInfo
-    #print "outoption is",outputOption
-    #print "guivalue is",guimodelvalue
-   
+    ##Calling function which take information for entry and label		
+    schematicInfo,outputOption,guimodelvalue=convertICintoBasicBlocks(schematicInfo,outputOption,guimodelvalue)		
+	
+    #Creating Frame and buttons for next page
+    nextframe=Frame(canvas,height=window_height,width=window_width)
+    nextbuttonframe=Frame(nextframe)
+    #Addbutton=Button(nextbuttonframe,text='Add',command=AddModelParametr)
+    Submitbutton=Button(nextbuttonframe,text='Submit & Exit',command=Submit)
+    Clearbutton=Button(nextbuttonframe,text='Clear',command=ClearModelParamValue)
     global nextcount
     nextcount=0
     global nextentry_var
-    if self.backClicked ==1:
-    	nextentry_var={}
+    nextentry_var={}
+    	
 
     ##Checking if any model is present
-    if guimodelvalue:
+    if guimodelvalue:			
     ## Calling Next frame generation function
        for line in guimodelvalue:
-	   print "line is ",line
-           if line[2] in guimodellist:
-              #print "ConvertICBlock index :",line[0]
-	      if self.backClicked==1:
-              	nextcount=self.nextframegeneration(line,nextentry_var,nextcount)
-           else:
-              print "Please look whether model is added in guimodellist inside code"
+	   if line[2] in guimodellist:
+	      print "ConvertICBlock index :",line[0]
+	      nextcount=nextframegeneration(nextframe,line,nextentry_var,nextcount)	
+	   else:
+	      print "Please look whether model is added in guimodellist inside code" 
     else:
-        print "There is no model in your circuit"
-	QMessageBox.about(self,"Model information","There is no model in your circuit")
+	print "There is no model in your circuit" 
+	AddModelParametr()
+	tkMessageBox.showinfo("Model List Info","There is no model in your circuit, please click on Submit & Exit Button" )
+	
+    
+    """	
+    for line in guimodelvalue:	
+	print "ConvertICBlock index :",line[0]
+	nextcount=nextframegeneration(nextframe,line,nextentry_var,nextcount)
+	if line[2]=='adc8':
+	   nextcount=nextframegeneration(nextframe,line,nextentry_var,nextcount)
+	   
+	   nextentry_var[nextcount]=StringVar()
+	   label=Label(nextframe,text=line[5],font=('Times', 15),anchor=CENTER,bg="Red")
+	   label.grid(row=nextcount,column=1,ipadx=5,ipady=5,padx=5,pady=5)
+	   nextcount=nextcount+1
+	   start=nextcount
+	   for item in range(len(line)-6):
+	       nextentry_var[nextcount]=StringVar()
+	       label=Label(nextframe,text=line[6+item])
+	       label.grid(row=nextcount,column=0,sticky=W+E+N+S,padx=5,pady=5)
+	       entry=Entry(nextframe,width=10,textvariable=nextentry_var[nextcount])
+	       entry.grid(row=nextcount,column=1,sticky=W+E+N+S,padx=5,pady=5)
+	       nextcount=nextcount+1
+	   end=nextcount-1
+	   guimodellisttrack.append([line[0],line[1],line[2],line[3],line[4],start,end])
+	
+	else:
+	   print "Please check whether model is available or not"
+    """	  
+    nextframe.grid()
+    nextbuttonframe.grid()
+    #Addbutton.grid(row=nextcount,column=1,padx=5,pady=5)
+    Submitbutton.grid(row=nextcount,column=2,padx=5,pady=5)
+    Clearbutton.grid(row=nextcount,column=3,padx=5,pady=5)
+    canvas.create_window(0, 0, anchor=NW, window=nextframe)
+    nextframe.update_idletasks()	
+    canvas.config(scrollregion=canvas.bbox("all"))
+    		
 
-        #AddModelParametr()
-       # tkMessageBox.showinfo("Model List Info","There is no model in your circuit, please click on Submit & Exit Button" )
-  
-  def nextframegeneration(self,line,nextentry_var,nextcount):
+     	
+
+def nextframegeneration(nextframe,line,nextentry_var,nextcount):
     print "Model Line in netlist is : ",line[1]
-    div=line[1].split()
-    #flag=present_already_model(div[0],line[2])
-    flag=0
-    #print "store ans here",stored_ans
-    store_ans_list=[]
-    if flag!=0:
-	    store_ans_list=stored_ans.split()
-	    print "list ",store_ans_list
-    indi=0
-    label=QLabel(line[5])
-    nw.grid.addWidget(label,self.nextrow,1)
+    nextentry_var[nextcount]=StringVar()
+    label=Label(nextframe,text=line[5],font=('Times', 14),anchor=CENTER,bg="Red")
+    label.grid(row=nextcount,column=1,ipadx=5,ipady=5,padx=5,pady=5)
+    nextcount=nextcount+1
     start=nextcount
-    self.nextrow=self.nextrow+1
     if line[2]=='ic':
        for item in range(len(line)-7):
-           label=QLabel(line[7+item])
-           nw.grid.addWidget(label,self.nextrow,0)
-           nextentry_var[nextcount]=QLineEdit()
-           nw.grid.addWidget(nextentry_var[nextcount],self.nextrow,1)
+           nextentry_var[nextcount]=StringVar()
+           label=Label(nextframe,text=line[7+item])
+           label.grid(row=nextcount,column=0,sticky=W+E+N+S,padx=5,pady=5)
+           entry=Entry(nextframe,width=10,textvariable=nextentry_var[nextcount])
+           entry.grid(row=nextcount,column=1,sticky=W+E+N+S,padx=5,pady=5)
            nextcount=nextcount+1
-           self.nextrow=self.nextrow+1
        end=nextcount-1
-       guimodellisttrack.append([line[0],line[1],line[2],line[3],line[4],start,end,line[6]])
+       guimodellisttrack.append([line[0],line[1],line[2],line[3],line[4],start,end,line[6]])		
     else:
        for item in range(len(line)-6):
-           label=QLabel(line[6+item])
-           nw.grid.addWidget(label,self.nextrow,0)
-           nextentry_var[nextcount]=QLineEdit()
-           nw.grid.addWidget(nextentry_var[nextcount],self.nextrow,1)
-	   if indi < len(store_ans_list) and flag ==1:
-		   nextentry_var[nextcount].setText(store_ans_list[indi])
-		   indi=indi+1 
+           nextentry_var[nextcount]=StringVar()
+           label=Label(nextframe,text=line[6+item])
+           label.grid(row=nextcount,column=0,sticky=W+E+N+S,padx=5,pady=5)
+           entry=Entry(nextframe,width=10,textvariable=nextentry_var[nextcount])
+           entry.grid(row=nextcount,column=1,sticky=W+E+N+S,padx=5,pady=5)
            nextcount=nextcount+1
-           self.nextrow=self.nextrow+1
        end=nextcount-1
-       guimodellisttrack.append([line[0],line[1],line[2],line[3],line[4],start,end])
-       
+       guimodellisttrack.append([line[0],line[1],line[2],line[3],line[4],start,end])	
     return nextcount
 
-  def ClearSourceValue(self):
-    #print "Clear Source Value"
-    for line in sourcelisttrack:
-        start=line[2]
-        end=line[3]
-        count=start
-        for item in range(int(end-start+1)):
-            entry_var[count].setText("")
-            count=count+1
-  def center(self):
-    qr=self.frameGeometry()
-    cp = QtGui.QDesktopWidget().availableGeometry().center()
-    qr.moveCenter(cp)
-    self.move(qr.topLeft())
-
-'''def present_already_model(val,model_name):
-  global stored_ans
-  print "model name is ", model_name
-  if os.path.exists(last_input_file):
-	  last_file=open(last_input_file)
-  else:
-	  last_file=open(last_input_file,'w+')
-  stored_val=last_file.read().strip().split('\n')
-  print "model test val ",val
-  flag=0
-  for line in stored_val:
-	  word=line.split()
-	  if len(word)==0:
-		  continue
-	  if word[0]=='.model':
-		  print "word is ",word," len is ",len(word)
-		  if word[1]==val:
-			  if ((word[2].startswith(model_name))):
-			        stored_ans=""
-				for tmp in range(2,len(word)-1):
-					try:
-						ind=word[tmp].index('=')+1
-						stored_ans=stored_ans+word[tmp][ind:]+" "
-					except:
-						print "Exception"
-				store_ans.strip()
-				print "model ans ",stored_ans
-				flag=1
-				break
-
-  last_file.close()
-  return flag
-'''	
-
-def present_already(vol,inpscr):
-  words=vol.split()
-  volsrc=words[0]
-  global store_ans
-  if os.path.exists(last_input_file):
-	  last_file=open(last_input_file)
-  else:
-	  last_file=open(last_input_file,'w+')
-  stored_val=last_file.read().strip().split('\n')
-  flag=0
-  for line in stored_val:
-	  word=line.split()
-	  if len(word)==0:
-		  continue;
-
-	  if word[0] == volsrc :
-		  if ((inpscr == 'ac' and inpscr == word[3]) or (inpscr == 'dc' and inpscr==word[3]) ):
-			if len(word)>4:
-	          		store_ans=word[4]	
-		  		flag=1
-			break	
-		  if ((inpscr == 'pwl' and word[3].startswith(inpscr)) or (inpscr=='exp' and word[3].startswith(inpscr)) or (inpscr=='pulse' and word[3].startswith(inpscr)) or (inpscr=='sine' and word[3].startswith(inpscr)) ):
-			store_ans=""
-			i=word[3].index('(')+1
-			j=word[len(word)-1].index(')')
-			store_ans=word[3][i:]+" "
-			for num in range(4,len(word)-1):
-				store_ans=store_ans+word[num]+" "
-			store_ans=store_ans+word[len(word)-1][:j]	
-			print store_ans
-			flag=1
-			break		  		
-  last_file.close()
-  return flag;
-  		   
 def AddModelParametr():
-    #print "models here"
-    #print "Adding Model Parameter"
-    #print "GuiModelValue",guimodelvalue
+    print "Adding Model Parameter"
+    print "GuiModelValue",guimodelvalue
     global guimodellisttrack	
     global modelparamvalue
     global addmodelline
@@ -434,45 +693,13 @@ def AddModelParametr():
     addmodelline=[]			
     
     for line in guimodellisttrack:
-	#print "model",line
-	if line[2]=='transfo':
-	   try:
-		#print "here in transfo"
-	   	start=line[5]
-		end=line[6]
-		num_turns=str(nextentry_var[start].text())
-		if num_turns=="": num_turns="310"	
-		h_array= "H_array = [ "
-		b_array = "B_array = [ "
-		h1=str(nextentry_var[start+1].text())
-		b1=str(nextentry_var[start+2].text())
-		if len(h1)!=0 and len(b1)!=0:
-			h_array=h_array+h1+" "
-			b_array=b_array+b1+" "
-			bh_array = h_array+" ] " + b_array+" ]"
-		else:
-			bh_array = "H_array = [-1000 -500 -375 -250 -188 -125 -63 0 63 125 188 250 375 500 1000] B_array = [-3.13e-3 -2.63e-3 -2.33e-3 -1.93e-3 -1.5e-3 -6.25e-4 -2.5e-4 0 2.5e-4 6.25e-4 1.5e-3 1.93e-3 2.33e-3 2.63e-3 3.13e-3]"
-		area=str(nextentry_var[start+3].text())
-		length=str(nextentry_var[start+4].text())
-        	if area=="": area="1"
-		if length=="":length="0.01"
-		num_turns2=str(nextentry_var[start+5].text())
-		if num_turns2=="": 
-			num_turns2="620"
-	  	addmodelline=".model "+line[3]+"_primary lcouple (num_turns= "+num_turns+")"
-		modelparamvalue.append([line[0],addmodelline,line[4]])
-		addmodelline=".model "+line[3]+"_iron_core core ("+bh_array+" area = "+area+" length ="+length +")"
-		modelparamvalue.append([line[0],addmodelline,line[4]])
-		addmodelline=".model "+line[3]+"_secondary lcouple (num_turns ="+num_turns2+ ")"	
-		modelparamvalue.append([line[0],addmodelline,line[4]])	
-	   except:
-	   	print "Caught an exception in transfo model ",line[1]
-        elif line[2]=='adc8':
+	print "GUI MODEL LIST TRACK",line
+        if line[2]=='adc8':
 	   try:
 		start=line[5]
-		end=line[6]	
-		in_low=str(nextentry_var[start].text())
-		in_high=str(nextentry_var[end].text())
+		end=line[6]
+		in_low=nextentry_var[start].get()
+		in_high=nextentry_var[end].get()
 		if in_low=="": in_low="0.8"
 		if in_high=="": in_high="2.0"
 	        addmodelline=".model "+ line[3]+" adc_bridge(in_low="+in_low+" in_high="+in_high+" )"
@@ -484,9 +711,9 @@ def AddModelParametr():
 	     try:
 		start=line[5]
 		end=line[6]
-		out_low=str(nextentry_var[start].text())
-		out_high=str(nextentry_var[start+1].text())
-		out_undef=str(nextentry_var[end].text())
+		out_low=nextentry_var[start].get()
+		out_high=nextentry_var[start+1].get()
+		out_undef=nextentry_var[end].get()
 		if out_low=="": out_low="0.2"
         	if out_high=="": out_high="5.0"
         	if out_undef=="": out_undef="5.0"
@@ -499,13 +726,13 @@ def AddModelParametr():
 	     try:
 		start=line[5]
 		end=line[6]
-		in_offset=str(nextentry_var[start].text())
-		gain=str(nextentry_var[start+1].text())
-		out_offset=str(nextentry_var[end].text())
+		in_offset=nextentry_var[start].get()
+		gain=nextentry_var[start+1].get()
+		out_offset=nextentry_var[end].get()
 	        if in_offset=="": in_offset="0.0"
 	        if gain=="": gain="1.0"
 	        if out_offset=="": out_offset="0.0"
-	        addmodelline=".model "+ line[3]+" gain(in_offset="+in_offset+" out_offset="+out_offset+" gain="+gain+" )"
+	        addmodelline=".model "+ line[3]+" gain(in_offset="+in_offset+" out_offset="+out_offset+" gain="+gain+")"
 		modelparamvalue.append([line[0],addmodelline,line[4]])
 	     except:
 		print "Caught an exception in gain model ",line[1]
@@ -514,19 +741,19 @@ def AddModelParametr():
 	     try:
 		start=line[5]
 		end=line[6]
-		in1_offset=str(nextentry_var[start].text())
-		in2_offset=str(nextentry_var[start+1].text())
-		in1_gain=str(nextentry_var[start+2].text())
-		in2_gain=str(nextentry_var[start+3].text())
-		out_gain=str(nextentry_var[start+4].text())
-		out_offset=str(nextentry_var[end].text())
+		in1_offset=nextentry_var[start].get()
+		in2_offset=nextentry_var[start+1].get()
+		in1_gain=nextentry_var[start+2].get()
+		in2_gain=nextentry_var[start+3].get()
+		out_gain=nextentry_var[start+4].get()
+		out_offset=nextentry_var[end].get()
 	        if in1_offset=="": in1_offset="0.0"
 	        if in2_offset=="": in2_offset="0.0"
 	        if in1_gain=="": in1_gain="1.0"
 	        if in2_gain=="": in2_gain="1.0"
 	        if out_gain=="": out_gain="1.0"
 	        if out_offset=="": out_offset="0.0"
-	        addmodelline=".model "+ line[3]+" summer(in_offset=["+in1_offset+" "+in2_offset+"] in_gain=["+in1_gain+" "+in2_gain+"] out_offset="+out_offset+" out_gain="+out_gain+" )" 
+	        addmodelline=".model "+ line[3]+" summer(in_offset=["+in1_offset+" "+in2_offset+"] in_gain=["+in1_gain+" "+in2_gain+"] out_offset="+out_offset+" out_gain="+out_gain+")" 
 		modelparamvalue.append([line[0],addmodelline,line[4]])
 	     except:
 		print "Caught an exception in summer model ",line[1] 
@@ -535,19 +762,19 @@ def AddModelParametr():
 	     try:
 		start=line[5]
 		end=line[6]
-		in1_offset=str(nextentry_var[start].text())
-		in2_offset=str(nextentry_var[start+1].text())
-		in1_gain=str(nextentry_var[start+2].text())
-		in2_gain=str(nextentry_var[start+3].text())
-		out_gain=str(nextentry_var[start+4].text())
-		out_offset=str(nextentry_var[end].text())
+		in1_offset=nextentry_var[start].get()
+		in2_offset=nextentry_var[start+1].get()
+		in1_gain=nextentry_var[start+2].get()
+		in2_gain=nextentry_var[start+3].get()
+		out_gain=nextentry_var[start+4].get()
+		out_offset=nextentry_var[end].get()
 	        if in1_offset=="": in1_offset="0.0"
 	        if in2_offset=="": in2_offset="0.0"
 	        if in1_gain=="": in1_gain="1.0"
 	        if in2_gain=="": in2_gain="1.0"
 	        if out_gain=="": out_gain="1.0"
 	        if out_offset=="": out_offset="0.0"
-	        addmodelline=".model "+ line[3]+" mult(in_offset=["+in1_offset+" "+in2_offset+"] in_gain=["+in1_gain+" "+in2_gain+"] out_offset="+out_offset+" out_gain="+out_gain+" )"
+	        addmodelline=".model "+ line[3]+" mult(in_offset=["+in1_offset+" "+in2_offset+"] in_gain=["+in1_gain+" "+in2_gain+"] out_offset="+out_offset+" out_gain="+out_gain+")"
 		modelparamvalue.append([line[0],addmodelline,line[4]])
 	     except:
 		print "Caught an exception in multiplier model ",line[1]
@@ -556,13 +783,13 @@ def AddModelParametr():
 	     try:
 		start=line[5]
 		end=line[6]
-		num_offset=str(nextentry_var[start].text())
-		den_offset=str(nextentry_var[start+1].text())
-		num_gain=str(nextentry_var[start+2].text())
-		den_gain=str(nextentry_var[start+3].text())
-		out_gain=str(nextentry_var[start+4].text())
-		out_offset=str(nextentry_var[start+5].text())
-		den_lower_limit=str(nextentry_var[end].text())
+		num_offset=nextentry_var[start].get()
+		den_offset=nextentry_var[start+1].get()
+		num_gain=nextentry_var[start+2].get()
+		den_gain=nextentry_var[start+3].get()
+		out_gain=nextentry_var[start+4].get()
+		out_offset=nextentry_var[start+5].get()
+		den_lower_limit=nextentry_var[end].get()
 	        if num_offset=="": num_offset="0.0"
 	        if den_offset=="": den_offset="0.0"
 	        if num_gain=="": num_gain="1.0"
@@ -570,7 +797,7 @@ def AddModelParametr():
 	        if out_gain=="": out_gain="1.0"
 	        if out_offset=="": out_offset="0.0"
 	        if den_lower_limit=="": den_lower_limit="1.0e-10"
-	        addmodelline=".model "+ line[3]+" divide(num_offset="+num_offset+" den_offset="+den_offset+" num_gain="+num_gain+" den_gain="+den_gain+" out_offset="+out_offset+" out_gain="+out_gain+" den_lower_limit="+den_lower_limit+" )"
+	        addmodelline=".model "+ line[3]+" divide(num_offset="+num_offset+" den_offset="+den_offset+" num_gain="+num_gain+" den_gain="+den_gain+" out_offset="+out_offset+" out_gain="+out_gain+" den_lower_limit="+den_lower_limit+")"
 		modelparamvalue.append([line[0],addmodelline,line[4]])
 	     except:
 		print "Caught an exception in divider model ",line[1]
@@ -579,15 +806,15 @@ def AddModelParametr():
 	     try:
 		start=line[5]
 		end=line[6]
-		lowerLimit=str(nextentry_var[start].text())
-		upperLimit=str(nextentry_var[start+1].text())
-		in_offset=str(nextentry_var[start+2].text())
-		gain=str(nextentry_var[end].text())
+		lowerLimit=nextentry_var[start].get()
+		upperLimit=nextentry_var[start+1].get()
+		in_offset=nextentry_var[start+2].get()
+		gain=nextentry_var[end].get()
         	if lowerLimit=="": lowerLimit="0.0"
 	        if upperLimit=="": upperLimit="5.0"
 	        if in_offset=="": in_offset="0.0"
 	        if gain=="": gain="1.0"
-	        addmodelline=".model "+ line[3]+" limit(out_lower_limit="+lowerLimit+" out_upper_limit="+upperLimit+" in_offset="+in_offset+" gain="+gain+" )"
+	        addmodelline=".model "+ line[3]+" limit(out_lower_limit="+lowerLimit+" out_upper_limit="+upperLimit+" in_offset="+in_offset+" gain="+gain+")"
 		modelparamvalue.append([line[0],addmodelline,line[4]])
 	     except:
 		print "Caught an exception in limit model ",line[1]
@@ -596,17 +823,17 @@ def AddModelParametr():
 	     try:
 		start=line[5]
 		end=line[6]
-		out_lower_limit=str(nextentry_var[start].text())
-		out_upper_limit=str(nextentry_var[start+1].text())
-		in_offset=str(nextentry_var[start+2].text())
-		gain=str(nextentry_var[start+3].text())
-		out_ic=str(nextentry_var[end].text())
+		out_lower_limit=nextentry_var[start].get()
+		out_upper_limit=nextentry_var[start+1].get()
+		in_offset=nextentry_var[start+2].get()
+		gain=nextentry_var[start+3].get()
+		out_ic=nextentry_var[end].get()
 	        if out_lower_limit=="": out_lower_limit="0.0"
 	        if out_upper_limit=="": out_upper_limit="5.0"
 	        if in_offset=="": in_offset="0.0"
 	        if gain=="": gain="1.0"
 	        if out_ic=="": out_ic="0.0"
-	        addmodelline=".model "+ line[3]+" int(out_lower_limit="+out_lower_limit+" out_upper_limit="+out_upper_limit+" in_offset="+in_offset+" gain="+gain+" out_ic="+out_ic+" )"
+	        addmodelline=".model "+ line[3]+" int(out_lower_limit="+out_lower_limit+" out_upper_limit="+out_upper_limit+" in_offset="+in_offset+" gain="+gain+" out_ic="+out_ic+")"
 		modelparamvalue.append([line[0],addmodelline,line[4]])
 	     except:
 		print "Caught an exception in integrator model ",line[1]
@@ -615,15 +842,15 @@ def AddModelParametr():
 	     try:
 		start=line[5]
 		end=line[6]
-		out_lower_limit=str(nextentry_var[start].text())
-		out_upper_limit=str(nextentry_var[start+1].text())
-		out_offset=str(nextentry_var[start+2].text())
-		gain=str(nextentry_var[end].text())
+		out_lower_limit=nextentry_var[start].get()
+		out_upper_limit=nextentry_var[start+1].get()
+		out_offset=nextentry_var[start+2].get()
+		gain=nextentry_var[end].get()
 	        if out_lower_limit=="": out_lower_limit="0.0"
 	        if out_upper_limit=="": out_upper_limit="5.0"
 	        if out_offset=="": out_offset="0.0"
 	        if gain=="": gain="1.0"
-	        addmodelline=".model "+ line[3]+" d_dt(out_lower_limit="+out_lower_limit+" out_upper_limit="+out_upper_limit+" out_offset="+out_offset+" gain="+gain+" )"
+	        addmodelline=".model "+ line[3]+" d_dt(out_lower_limit="+out_lower_limit+" out_upper_limit="+out_upper_limit+" out_offset="+out_offset+" gain="+gain+")"
 		modelparamvalue.append([line[0],addmodelline,line[4]])
 	     except:
 		print "Caught an exception in differentiator model ",line[1]
@@ -632,15 +859,15 @@ def AddModelParametr():
 	     try:
 		start=line[5]
 		end=line[6]
-		lowerLimit=str(nextentry_var[start].text())
-		upperLimit=str(nextentry_var[start+1].text())
-		in_offset=str(nextentry_var[start+2].text())
-		gain=str(nextentry_var[end].text())
+		lowerLimit=nextentry_var[start].get()
+		upperLimit=nextentry_var[start+1].get()
+		in_offset=nextentry_var[start+2].get()
+		gain=nextentry_var[end].get()
 	        if lowerLimit=="": lowerLimit="0.0"
 	        if upperLimit=="": upperLimit="5.0"
 	        if in_offset=="": in_offset="0.0"
 	        if gain=="": gain="1.0"
-	        addmodelline=".model "+ line[3]+" limit(out_lower_limit="+lowerLimit+" out_upper_limit="+upperLimit+" in_offset="+in_offset+" gain="+gain+" )"
+	        addmodelline=".model "+ line[3]+" limit(out_lower_limit="+lowerLimit+" out_upper_limit="+upperLimit+" in_offset="+in_offset+" gain="+gain+")"
 		modelparamvalue.append([line[0],addmodelline,line[4]])
 	     except:
 		print "Caught an exception in limit8 model ",line[1]
@@ -649,8 +876,8 @@ def AddModelParametr():
 	     try:
 		start=line[5]
 		end=line[6]
-		in_offset=str(nextentry_var[start].text())
-		gain=str(nextentry_var[end].text())
+		in_offset=nextentry_var[start].get()
+		gain=nextentry_var[end].get()
                 if in_offset=="": in_offset="0.0"
         	if gain=="": gain="1.0"
         	addmodelline=".model "+ line[3]+" climit(in_offset="+in_offset+" gain="+gain+")"
@@ -662,15 +889,15 @@ def AddModelParametr():
 	     try:
 		start=line[5]
 		end=line[6]
-		cntl_on=str(nextentry_var[start].text())
-		cntl_off=str(nextentry_var[start+1].text())
-		r_on=str(nextentry_var[start+2].text())
-		r_off=str(nextentry_var[end].text())
+		cntl_on=nextentry_var[start].get()
+		cntl_off=nextentry_var[start+1].get()
+		r_on=nextentry_var[start+2].get()
+		r_off=nextentry_var[end].get()
         	if cntl_on=="": cntl_on="5.0"
 	        if cntl_off=="": cntl_off="0.0"
 	        if r_on=="": r_on="10.0"
 	        if r_off=="": r_off="1e6"
-	        addmodelline=".model "+ line[3]+" aswitch(cntl_on="+cntl_on+" cntl_off="+cntl_off+" r_on="+r_on+" r_off="+r_off+" )"
+	        addmodelline=".model "+ line[3]+" aswitch(cntl_on="+cntl_on+" cntl_off="+cntl_off+" r_on="+r_on+" r_off="+r_off+")"
 		modelparamvalue.append([line[0],addmodelline,line[4]])
 	     except:
 		print "Caught an exception in analogswitch model ",line[1]  
@@ -679,15 +906,15 @@ def AddModelParametr():
 	     try:
 		start=line[5]
 		end=line[6]
-		v_breakdown=str(nextentry_var[start].text())
-		i_breakdown=str(nextentry_var[start+1].text())
-		i_sat=str(nextentry_var[start+2].text())
-		n_forward=str(nextentry_var[end].text())
+		v_breakdown=nextentry_var[start].get()
+		i_breakdown=nextentry_var[start+1].get()
+		i_sat=nextentry_var[start+2].get()
+		n_forward=nextentry_var[end].get()
 	        if v_breakdown=="": v_breakdown="5.6"
 	        if i_breakdown=="": i_breakdown="1.0e-2"
 	        if i_sat=="": i_sat="1.0e-12"
 	        if n_forward=="": n_forward="1.0"
-	        addmodelline=".model "+ line[3]+" zener(v_breakdown="+v_breakdown+" i_breakdown="+i_breakdown+" i_sat="+i_sat+" n_forward="+n_forward+" )"
+	        addmodelline=".model "+ line[3]+" zener(v_breakdown="+v_breakdown+" i_breakdown="+i_breakdown+" i_sat="+i_sat+" n_forward="+n_forward+")"
 		modelparamvalue.append([line[0],addmodelline,line[4]])
 	     except:
 		print "Caught an exception in zener model ",line[1]   	
@@ -696,13 +923,13 @@ def AddModelParametr():
 	     try:
 		start=line[5]
 		end=line[6]
-		rise_delay=str(nextentry_var[start].text())
-		fall_delay=str(nextentry_var[start+1].text())
-		input_load=str(nextentry_var[end].text())
+		rise_delay=nextentry_var[start].get()
+		fall_delay=nextentry_var[start+1].get()
+		input_load=nextentry_var[end].get()
                 if rise_delay=="": rise_delay="1e-12"
         	if fall_delay=="": fall_delay="1e-12"
         	if input_load=="": input_load="1e-12"
-        	addmodelline=".model "+ line[3]+" d_buffer(rise_delay="+rise_delay+" fall_delay="+fall_delay+" input_load="+input_load+" )"
+        	addmodelline=".model "+ line[3]+" d_buffer(rise_delay="+rise_delay+" fall_delay="+fall_delay+" input_load="+input_load+")"
 		modelparamvalue.append([line[0],addmodelline,line[4]])
 	     except:
 		print "Caught an exception in d_buffer model ",line[1]
@@ -711,13 +938,13 @@ def AddModelParametr():
 	     try:
 		start=line[5]
 		end=line[6]
-		rise_delay=str(nextentry_var[start].text())
-		fall_delay=str(nextentry_var[start+1].text())
-		input_load=str(nextentry_var[end].text())
+		rise_delay=nextentry_var[start].get()
+		fall_delay=nextentry_var[start+1].get()
+		input_load=nextentry_var[end].get()
         	if rise_delay=="": rise_delay="1e-12"
 	        if fall_delay=="": fall_delay="1e-12"
         	if input_load=="": input_load="1e-12"
-        	addmodelline=".model "+ line[3]+" d_inverter(rise_delay="+rise_delay+" fall_delay="+fall_delay+" input_load="+input_load+" )"
+        	addmodelline=".model "+ line[3]+" d_inverter(rise_delay="+rise_delay+" fall_delay="+fall_delay+" input_load="+input_load+")"
 		modelparamvalue.append([line[0],addmodelline,line[4]])
 	     except:
 		print "Caught an exception in d_inverter model ",line[1]
@@ -726,13 +953,13 @@ def AddModelParametr():
 	     try:
 		start=line[5]
 		end=line[6]
-		rise_delay=str(nextentry_var[start].text())
-		fall_delay=str(nextentry_var[start+1].text())
-		input_load=str(nextentry_var[end].text())
+		rise_delay=nextentry_var[start].get()
+		fall_delay=nextentry_var[start+1].get()
+		input_load=nextentry_var[end].get()
         	if rise_delay=="": rise_delay="1e-12"
 	        if fall_delay=="": fall_delay="1e-12"
         	if input_load=="": input_load="1e-12"
-        	addmodelline=".model "+ line[3]+" d_and(rise_delay="+rise_delay+" fall_delay="+fall_delay+" input_load="+input_load+" )"
+        	addmodelline=".model "+ line[3]+" d_and(rise_delay="+rise_delay+" fall_delay="+fall_delay+" input_load="+input_load+")"
 		modelparamvalue.append([line[0],addmodelline,line[4]])
 	     except:
 		print "Caught an exception in d_and model ",line[1] 
@@ -741,13 +968,13 @@ def AddModelParametr():
 	     try:
 		start=line[5]
 		end=line[6]
-		rise_delay=str(nextentry_var[start].text())
-		fall_delay=str(nextentry_var[start+1].text())
-		input_load=str(nextentry_var[end].text())
+		rise_delay=nextentry_var[start].get()
+		fall_delay=nextentry_var[start+1].get()
+		input_load=nextentry_var[end].get()
         	if rise_delay=="": rise_delay="1e-12"
 	        if fall_delay=="": fall_delay="1e-12"
         	if input_load=="": input_load="1e-12"
-        	addmodelline=".model "+ line[3]+" d_nand(rise_delay="+rise_delay+" fall_delay="+fall_delay+" input_load="+input_load+" )"
+        	addmodelline=".model "+ line[3]+" d_nand(rise_delay="+rise_delay+" fall_delay="+fall_delay+" input_load="+input_load+")"
 		modelparamvalue.append([line[0],addmodelline,line[4]])
 	     except:
 		print "Caught an exception in d_nand model ",line[1] 
@@ -756,13 +983,13 @@ def AddModelParametr():
 	     try:
 		start=line[5]
 		end=line[6]
-		rise_delay=str(nextentry_var[start].text())
-		fall_delay=str(nextentry_var[start+1].text())
-		input_load=str(nextentry_var[end].text())
+		rise_delay=nextentry_var[start].get()
+		fall_delay=nextentry_var[start+1].get()
+		input_load=nextentry_var[end].get()
         	if rise_delay=="": rise_delay="1e-12"
 	        if fall_delay=="": fall_delay="1e-12"
         	if input_load=="": input_load="1e-12"
-        	addmodelline=".model "+ line[3]+" d_or(rise_delay="+rise_delay+" fall_delay="+fall_delay+" input_load="+input_load+" )"
+        	addmodelline=".model "+ line[3]+" d_or(rise_delay="+rise_delay+" fall_delay="+fall_delay+" input_load="+input_load+")"
 		modelparamvalue.append([line[0],addmodelline,line[4]])
 	     except:
 		print "Caught an exception in d_or model ",line[1] 
@@ -771,13 +998,13 @@ def AddModelParametr():
 	     try:
 		start=line[5]
 		end=line[6]
-		rise_delay=str(nextentry_var[start].text())
-		fall_delay=str(nextentry_var[start+1].text())
-		input_load=str(nextentry_var[end].text())
+		rise_delay=nextentry_var[start].get()
+		fall_delay=nextentry_var[start+1].get()
+		input_load=nextentry_var[end].get()
         	if rise_delay=="": rise_delay="1e-12"
 	        if fall_delay=="": fall_delay="1e-12"
         	if input_load=="": input_load="1e-12"
-        	addmodelline=".model "+ line[3]+" d_nor(rise_delay="+rise_delay+" fall_delay="+fall_delay+" input_load="+input_load+" )"
+        	addmodelline=".model "+ line[3]+" d_nor(rise_delay="+rise_delay+" fall_delay="+fall_delay+" input_load="+input_load+")"
 		modelparamvalue.append([line[0],addmodelline,line[4]])
 	     except:
 		print "Caught an exception in d_nor model ",line[1]   	
@@ -786,13 +1013,13 @@ def AddModelParametr():
 	     try:
 		start=line[5]
 		end=line[6]
-		rise_delay=str(nextentry_var[start].text())
-		fall_delay=str(nextentry_var[start+1].text())
-		input_load=str(nextentry_var[end].text())
+		rise_delay=nextentry_var[start].get()
+		fall_delay=nextentry_var[start+1].get()
+		input_load=nextentry_var[end].get()
         	if rise_delay=="": rise_delay="1e-12"
 	        if fall_delay=="": fall_delay="1e-12"
         	if input_load=="": input_load="1e-12"
-        	addmodelline=".model "+ line[3]+" d_xor(rise_delay="+rise_delay+" fall_delay="+fall_delay+" input_load="+input_load+" )"
+        	addmodelline=".model "+ line[3]+" d_xor(rise_delay="+rise_delay+" fall_delay="+fall_delay+" input_load="+input_load+")"
 		modelparamvalue.append([line[0],addmodelline,line[4]])
 	     except:
 		print "Caught an exception in d_xor model ",line[1]   
@@ -801,13 +1028,13 @@ def AddModelParametr():
 	     try:
 		start=line[5]
 		end=line[6]
-		rise_delay=str(nextentry_var[start].text())
-		fall_delay=str(nextentry_var[start+1].text())
-		input_load=str(nextentry_var[end].text())
+		rise_delay=nextentry_var[start].get()
+		fall_delay=nextentry_var[start+1].get()
+		input_load=nextentry_var[end].get()
         	if rise_delay=="": rise_delay="1e-12"
 	        if fall_delay=="": fall_delay="1e-12"
         	if input_load=="": input_load="1e-12"
-        	addmodelline=".model "+ line[3]+" d_xnor(rise_delay="+rise_delay+" fall_delay="+fall_delay+" input_load="+input_load+" )"
+        	addmodelline=".model "+ line[3]+" d_xnor(rise_delay="+rise_delay+" fall_delay="+fall_delay+" input_load="+input_load+")"
 		modelparamvalue.append([line[0],addmodelline,line[4]])
 	     except:
 		print "Caught an exception in d_xnor model ",line[1]
@@ -816,13 +1043,13 @@ def AddModelParametr():
 	     try:
 		start=line[5]
 		end=line[6]
-		delay=str(nextentry_var[start].text())
-		input_load=str(nextentry_var[start+1].text())
-		enable_load=str(nextentry_var[end].text())
+		delay=nextentry_var[start].get()
+		input_load=nextentry_var[start+1].get()
+		enable_load=nextentry_var[end].get()
         	if delay=="": delay="1e-12"
 	        if input_load=="": input_load="1e-12"
         	if enable_load=="": enable_load="1e-12"
-        	addmodelline=".model "+ line[3]+" d_tristate(delay="+delay+" enable_load="+enable_load+" input_load="+input_load+" )"
+        	addmodelline=".model "+ line[3]+" d_tristate(delay="+delay+" enable_load="+enable_load+" input_load="+input_load+")"
 		modelparamvalue.append([line[0],addmodelline,line[4]])
 	     except:
 		print "Caught an exception in d_tristate model ",line[1] 
@@ -831,9 +1058,9 @@ def AddModelParametr():
 	     try:
 		start=line[5]
 		end=line[6]
-		load=str(nextentry_var[start].text())
+		load=nextentry_var[start].get()
  		if load=="": load="1e-12"
-        	addmodelline=".model "+ line[3]+" d_pullup(load="+load+" )"
+        	addmodelline=".model "+ line[3]+" d_pullup(load="+load+")"
         	modelparamvalue.append([line[0],addmodelline,line[4]])
 	     except:
 		print "Caught an exception in d_pullup model ",line[1]
@@ -842,9 +1069,9 @@ def AddModelParametr():
 	     try:
 		start=line[5]
 		end=line[6]
-		load=str(nextentry_var[start].text())
+		load=nextentry_var[start].get()
  		if load=="": load="1e-12"
-        	addmodelline=".model "+ line[3]+" d_pulldown(load="+load+" )"
+        	addmodelline=".model "+ line[3]+" d_pulldown(load="+load+")"
         	modelparamvalue.append([line[0],addmodelline,line[4]])
 	     except:
 		print "Caught an exception in d_pulldown model ",line[1]
@@ -853,17 +1080,17 @@ def AddModelParametr():
 	     try:
 		start=line[5]
 		end=line[6]
-		sr_delay=str(nextentry_var[start].text())
-		enable_delay=str(nextentry_var[start+1].text())
-		set_delay=str(nextentry_var[start+2].text())
-		reset_delay=str(nextentry_var[start+3].text())
-		ic=str(nextentry_var[start+4].text())
-		sr_load=str(nextentry_var[start+5].text())
-		enable_load=str(nextentry_var[start+6].text())
-		set_load=str(nextentry_var[start+7].text())
-		reset_load=str(nextentry_var[start+8].text())
-		rise_delay=str(nextentry_var[start+9].text())
-		fall_delay=str(nextentry_var[end].text())
+		sr_delay=nextentry_var[start].get()
+		enable_delay=nextentry_var[start+1].get()
+		set_delay=nextentry_var[start+2].get()
+		reset_delay=nextentry_var[start+3].get()
+		ic=nextentry_var[start+4].get()
+		sr_load=nextentry_var[start+5].get()
+		enable_load=nextentry_var[start+6].get()
+		set_load=nextentry_var[start+7].get()
+		reset_load=nextentry_var[start+8].get()
+		rise_delay=nextentry_var[start+9].get()
+		fall_delay=nextentry_var[end].get()
                 if sr_delay=="": sr_delay="1e-12"
         	if enable_delay=="": enable_delay="1e-12"
         	if set_delay=="": set_delay="1e-12"
@@ -875,7 +1102,7 @@ def AddModelParametr():
         	if reset_load=="": reset_load="1e-12"
         	if rise_delay=="": rise_delay="1e-12"
         	if fall_delay=="": fall_delay="1e-12"
-        	addmodelline=".model "+ line[3]+" d_srlatch(rise_delay="+rise_delay+" fall_delay="+fall_delay+" ic="+ic+"\n+sr_load="+sr_load+" enable_load="+enable_load+" set_load="+set_load+" reset_load="+reset_load+"\n+sr_delay="+sr_delay+" enable_delay="+enable_delay+" set_delay="+set_delay+" reset_delay="+reset_delay+" )"
+        	addmodelline=".model "+ line[3]+" d_srlatch(rise_delay="+rise_delay+" fall_delay="+fall_delay+" ic="+ic+"\n+sr_load="+sr_load+" enable_load="+enable_load+" set_load="+set_load+" reset_load="+reset_load+"\n+sr_delay="+sr_delay+" enable_delay="+enable_delay+" set_delay="+set_delay+" reset_delay="+reset_delay+")"
 		modelparamvalue.append([line[0],addmodelline,line[4]])
 	     except:
 		print "Caught an exception in d_srlatch model ",line[1]  
@@ -884,17 +1111,17 @@ def AddModelParametr():
 	     try:
 		start=line[5]
 		end=line[6]
-		jk_delay=str(nextentry_var[start].text())
-		enable_delay=str(nextentry_var[start+1].text())
-		set_delay=str(nextentry_var[start+2].text())
-		reset_delay=str(nextentry_var[start+3].text())
-		ic=str(nextentry_var[start+4].text())
-		jk_load=str(nextentry_var[start+5].text())
-		enable_load=str(nextentry_var[start+6].text())
-		set_load=str(nextentry_var[start+7].text())
-		reset_load=str(nextentry_var[start+8].text())
-		rise_delay=str(nextentry_var[start+9].text())
-		fall_delay=str(nextentry_var[end].text())
+		jk_delay=nextentry_var[start].get()
+		enable_delay=nextentry_var[start+1].get()
+		set_delay=nextentry_var[start+2].get()
+		reset_delay=nextentry_var[start+3].get()
+		ic=nextentry_var[start+4].get()
+		jk_load=nextentry_var[start+5].get()
+		enable_load=nextentry_var[start+6].get()
+		set_load=nextentry_var[start+7].get()
+		reset_load=nextentry_var[start+8].get()
+		rise_delay=nextentry_var[start+9].get()
+		fall_delay=nextentry_var[end].get()
                 if jk_delay=="": jk_delay="1e-12"
         	if enable_delay=="": enable_delay="1e-12"
         	if set_delay=="": set_delay="1e-12"
@@ -906,7 +1133,7 @@ def AddModelParametr():
         	if reset_load=="": reset_load="1e-12"
         	if rise_delay=="": rise_delay="1e-12"
         	if fall_delay=="": fall_delay="1e-12"
-        	addmodelline=".model "+ line[3]+" d_jklatch(rise_delay="+rise_delay+" fall_delay="+fall_delay+" ic="+ic+"\n+jk_load="+jk_load+" enable_load="+enable_load+" set_load="+set_load+" reset_load="+reset_load+"\n+jk_delay="+jk_delay+" enable_delay="+enable_delay+" set_delay="+set_delay+" reset_delay="+reset_delay+" )"
+        	addmodelline=".model "+ line[3]+" d_jklatch(rise_delay="+rise_delay+" fall_delay="+fall_delay+" ic="+ic+"\n+jk_load="+jk_load+" enable_load="+enable_load+" set_load="+set_load+" reset_load="+reset_load+"\n+jk_delay="+jk_delay+" enable_delay="+enable_delay+" set_delay="+set_delay+" reset_delay="+reset_delay+")"
 		modelparamvalue.append([line[0],addmodelline,line[4]])
 	     except:
 		print "Caught an exception in d_jklatch model ",line[1] 
@@ -915,17 +1142,17 @@ def AddModelParametr():
 	     try:
 		start=line[5]
 		end=line[6]
-		data_delay=str(nextentry_var[start].text())
-		enable_delay=str(nextentry_var[start+1].text())
-		set_delay=str(nextentry_var[start+2].text())
-		reset_delay=str(nextentry_var[start+3].text())
-		ic=str(nextentry_var[start+4].text())
-		data_load=str(nextentry_var[start+5].text())
-		enable_load=str(nextentry_var[start+6].text())
-		set_load=str(nextentry_var[start+7].text())
-		reset_load=str(nextentry_var[start+8].text())
-		rise_delay=str(nextentry_var[start+9].text())
-		fall_delay=str(nextentry_var[end].text())
+		data_delay=nextentry_var[start].get()
+		enable_delay=nextentry_var[start+1].get()
+		set_delay=nextentry_var[start+2].get()
+		reset_delay=nextentry_var[start+3].get()
+		ic=nextentry_var[start+4].get()
+		data_load=nextentry_var[start+5].get()
+		enable_load=nextentry_var[start+6].get()
+		set_load=nextentry_var[start+7].get()
+		reset_load=nextentry_var[start+8].get()
+		rise_delay=nextentry_var[start+9].get()
+		fall_delay=nextentry_var[end].get()
                 if data_delay=="": data_delay="1e-12"
         	if enable_delay=="": enable_delay="1e-12"
         	if set_delay=="": set_delay="1e-12"
@@ -937,7 +1164,7 @@ def AddModelParametr():
         	if reset_load=="": reset_load="1e-12"
         	if rise_delay=="": rise_delay="1e-12"
         	if fall_delay=="": fall_delay="1e-12"
-        	addmodelline=".model "+ line[3]+" d_dlatch(rise_delay="+rise_delay+" fall_delay="+fall_delay+" ic="+ic+"\n+data_load="+data_load+" enable_load="+enable_load+" set_load="+set_load+" reset_load="+reset_load+"\n+data_delay="+data_delay+" enable_delay="+enable_delay+" set_delay="+set_delay+" reset_delay="+reset_delay+" )"
+        	addmodelline=".model "+ line[3]+" d_dlatch(rise_delay="+rise_delay+" fall_delay="+fall_delay+" ic="+ic+"\n+data_load="+data_load+" enable_load="+enable_load+" set_load="+set_load+" reset_load="+reset_load+"\n+data_delay="+data_delay+" enable_delay="+enable_delay+" set_delay="+set_delay+" reset_delay="+reset_delay+")"
 		modelparamvalue.append([line[0],addmodelline,line[4]])
 	     except:
 		print "Caught an exception in d_dlatch model ",line[1]  
@@ -946,17 +1173,17 @@ def AddModelParametr():
 	     try:
 		start=line[5]
 		end=line[6]
-		t_delay=str(nextentry_var[start].text())
-		enable_delay=str(nextentry_var[start+1].text())
-		set_delay=str(nextentry_var[start+2].text())
-		reset_delay=str(nextentry_var[start+3].text())
-		ic=str(nextentry_var[start+4].text())
-		t_load=str(nextentry_var[start+5].text())
-		enable_load=str(nextentry_var[start+6].text())
-		set_load=str(nextentry_var[start+7].text())
-		reset_load=str(nextentry_var[start+8].text())
-		rise_delay=str(nextentry_var[start+9].text())
-		fall_delay=str(nextentry_var[end].text())
+		t_delay=nextentry_var[start].get()
+		enable_delay=nextentry_var[start+1].get()
+		set_delay=nextentry_var[start+2].get()
+		reset_delay=nextentry_var[start+3].get()
+		ic=nextentry_var[start+4].get()
+		t_load=nextentry_var[start+5].get()
+		enable_load=nextentry_var[start+6].get()
+		set_load=nextentry_var[start+7].get()
+		reset_load=nextentry_var[start+8].get()
+		rise_delay=nextentry_var[start+9].get()
+		fall_delay=nextentry_var[end].get()
                 if t_delay=="": t_delay="1e-12"
         	if enable_delay=="": enable_delay="1e-12"
         	if set_delay=="": set_delay="1e-12"
@@ -968,7 +1195,7 @@ def AddModelParametr():
         	if reset_load=="": reset_load="1e-12"
         	if rise_delay=="": rise_delay="1e-12"
         	if fall_delay=="": fall_delay="1e-12"
-        	addmodelline=".model "+ line[3]+" d_tlatch(rise_delay="+rise_delay+" fall_delay="+fall_delay+" ic="+ic+"\n+t_load="+t_load+" enable_load="+enable_load+" set_load="+set_load+" reset_load="+reset_load+"\n+t_delay="+t_delay+" enable_delay="+enable_delay+" set_delay="+set_delay+" reset_delay="+reset_delay+" )"
+        	addmodelline=".model "+ line[3]+" d_tlatch(rise_delay="+rise_delay+" fall_delay="+fall_delay+" ic="+ic+"\n+t_load="+t_load+" enable_load="+enable_load+" set_load="+set_load+" reset_load="+reset_load+"\n+t_delay="+t_delay+" enable_delay="+enable_delay+" set_delay="+set_delay+" reset_delay="+reset_delay+")"
 		modelparamvalue.append([line[0],addmodelline,line[4]])
 	     except:
 		print "Caught an exception in d_tlatch model ",line[1]  
@@ -977,16 +1204,16 @@ def AddModelParametr():
 	     try:
 		start=line[5]
 		end=line[6]
-		clk_delay=str(nextentry_var[start].text())
-		set_delay=str(nextentry_var[start].text())
-		reset_delay=str(nextentry_var[start].text())
-		ic=str(nextentry_var[start].text())
-		sr_load=str(nextentry_var[start].text())
-		clk_load=str(nextentry_var[start].text())
-		set_load=str(nextentry_var[start].text())
-		reset_load=str(nextentry_var[start].text())
-		rise_delay=str(nextentry_var[start].text())
-		fall_delay=str(nextentry_var[start].text())
+		clk_delay=nextentry_var[start].get()
+		set_delay=nextentry_var[start].get()
+		reset_delay=nextentry_var[start].get()
+		ic=nextentry_var[start].get()
+		sr_load=nextentry_var[start].get()
+		clk_load=nextentry_var[start].get()
+		set_load=nextentry_var[start].get()
+		reset_load=nextentry_var[start].get()
+		rise_delay=nextentry_var[start].get()
+		fall_delay=nextentry_var[start].get()
 	        if clk_delay=="": clk_delay="1e-12"
 	        if set_delay=="": set_delay="1e-12"
 	        if reset_delay=="": reset_delay="1e-12"
@@ -997,7 +1224,7 @@ def AddModelParametr():
 	        if reset_load=="": reset_load="1e-12"
 	        if rise_delay=="": rise_delay="1e-12"
 	        if fall_delay=="": fall_delay="1e-12"
-	        addmodelline=".model "+ line[3]+" d_srff(rise_delay="+rise_delay+" fall_delay="+fall_delay+" ic="+ic+"\n+sr_load="+sr_load+" clk_load="+clk_load+" set_load="+set_load+" reset_load="+reset_load+"\n+clk_delay="+clk_delay+" set_delay="+set_delay+" reset_delay="+reset_delay+" )"
+	        addmodelline=".model "+ line[3]+" d_srff(rise_delay="+rise_delay+" fall_delay="+fall_delay+" ic="+ic+"\n+sr_load="+sr_load+" clk_load="+clk_load+" set_load="+set_load+" reset_load="+reset_load+"\n+clk_delay="+clk_delay+" set_delay="+set_delay+" reset_delay="+reset_delay+")"
 		modelparamvalue.append([line[0],addmodelline,line[4]])
 	     except:
 		print "Caught an exception in d_srff model ",line[1] 
@@ -1006,16 +1233,16 @@ def AddModelParametr():
 	     try:
 		start=line[5]
 		end=line[6]
-		clk_delay=str(nextentry_var[start].text())
-		set_delay=str(nextentry_var[start].text())
-		reset_delay=str(nextentry_var[start].text())
-		ic=str(nextentry_var[start].text())
-		jk_load=str(nextentry_var[start].text())
-		clk_load=str(nextentry_var[start].text())
-		set_load=str(nextentry_var[start].text())
-		reset_load=str(nextentry_var[start].text())
-		rise_delay=str(nextentry_var[start].text())
-		fall_delay=str(nextentry_var[start].text())
+		clk_delay=nextentry_var[start].get()
+		set_delay=nextentry_var[start].get()
+		reset_delay=nextentry_var[start].get()
+		ic=nextentry_var[start].get()
+		jk_load=nextentry_var[start].get()
+		clk_load=nextentry_var[start].get()
+		set_load=nextentry_var[start].get()
+		reset_load=nextentry_var[start].get()
+		rise_delay=nextentry_var[start].get()
+		fall_delay=nextentry_var[start].get()
 	        if clk_delay=="": clk_delay="1e-12"
 	        if set_delay=="": set_delay="1e-12"
 	        if reset_delay=="": reset_delay="1e-12"
@@ -1026,7 +1253,7 @@ def AddModelParametr():
 	        if reset_load=="": reset_load="1e-12"
 	        if rise_delay=="": rise_delay="1e-12"
 	        if fall_delay=="": fall_delay="1e-12"
-	        addmodelline=".model "+ line[3]+" d_jkff(rise_delay="+rise_delay+" fall_delay="+fall_delay+" ic="+ic+"\n+jk_load="+jk_load+" clk_load="+clk_load+" set_load="+set_load+" reset_load="+reset_load+"\n+clk_delay="+enable_delay+" set_delay="+set_delay+" reset_delay="+reset_delay+" )"
+	        addmodelline=".model "+ line[3]+" d_jkff(rise_delay="+rise_delay+" fall_delay="+fall_delay+" ic="+ic+"\n+jk_load="+jk_load+" clk_load="+clk_load+" set_load="+set_load+" reset_load="+reset_load+"\n+clk_delay="+enable_delay+" set_delay="+set_delay+" reset_delay="+reset_delay+")"
 		modelparamvalue.append([line[0],addmodelline,line[4]])
 	     except:
 		print "Caught an exception in d_jkff model ",line[1] 
@@ -1035,16 +1262,16 @@ def AddModelParametr():
 	     try:
 		start=line[5]
 		end=line[6]
-		clk_delay=str(nextentry_var[start].text())
-		set_delay=str(nextentry_var[start+1].text())
-		reset_delay=str(nextentry_var[start+2].text())
-		ic=str(nextentry_var[start+3].text())
-		data_load=str(nextentry_var[start+4].text())
-		clk_load=str(nextentry_var[start+5].text())
-		set_load=str(nextentry_var[start+6].text())
-		reset_load=str(nextentry_var[start+7].text())
-		rise_delay=str(nextentry_var[start+8].text())
-		fall_delay=str(nextentry_var[end].text())
+		clk_delay=nextentry_var[start].get()
+		set_delay=nextentry_var[start+1].get()
+		reset_delay=nextentry_var[start+2].get()
+		ic=nextentry_var[start+3].get()
+		data_load=nextentry_var[start+4].get()
+		clk_load=nextentry_var[start+5].get()
+		set_load=nextentry_var[start+6].get()
+		reset_load=nextentry_var[start+7].get()
+		rise_delay=nextentry_var[start+8].get()
+		fall_delay=nextentry_var[end].get()
                 if clk_delay=="": clk_delay="1e-12"
         	if set_delay=="": set_delay="1e-12"
         	if reset_delay=="": reset_delay="1e-12"
@@ -1055,7 +1282,7 @@ def AddModelParametr():
         	if reset_load=="": reset_load="1e-12"
         	if rise_delay=="": rise_delay="1e-12"
         	if fall_delay=="": fall_delay="1e-12"
-        	addmodelline=".model "+ line[3]+" d_dff(rise_delay="+rise_delay+" fall_delay="+fall_delay+" ic="+ic+"\n+data_load="+data_load+" clk_load="+clk_load+" set_load="+set_load+" reset_load="+reset_load+"\n+clk_delay="+clk_delay+" set_delay="+set_delay+" reset_delay="+reset_delay+" )"
+        	addmodelline=".model "+ line[3]+" d_dff(rise_delay="+rise_delay+" fall_delay="+fall_delay+" ic="+ic+"\n+data_load="+data_load+" clk_load="+clk_load+" set_load="+set_load+" reset_load="+reset_load+"\n+clk_delay="+clk_delay+" set_delay="+set_delay+" reset_delay="+reset_delay+")"
 		modelparamvalue.append([line[0],addmodelline,line[4]])
 	     except:
 		print "Caught an exception in d_dff model ",line[1] 
@@ -1064,16 +1291,16 @@ def AddModelParametr():
 	     try:
 		start=line[5]
 		end=line[6]
-		clk_delay=str(nextentry_var[start].text())
-		set_delay=str(nextentry_var[start+1].text())
-		reset_delay=str(nextentry_var[start+2].text())
-		ic=str(nextentry_var[start+3].text())
-		t_load=str(nextentry_var[start+4].text())
-		clk_load=str(nextentry_var[start+5].text())
-		set_load=str(nextentry_var[start+6].text())
-		reset_load=str(nextentry_var[start+7].text())
-		rise_delay=str(nextentry_var[start+8].text())
-		fall_delay=str(nextentry_var[end].text())
+		clk_delay=nextentry_var[start].get()
+		set_delay=nextentry_var[start+1].get()
+		reset_delay=nextentry_var[start+2].get()
+		ic=nextentry_var[start+3].get()
+		t_load=nextentry_var[start+4].get()
+		clk_load=nextentry_var[start+5].get()
+		set_load=nextentry_var[start+6].get()
+		reset_load=nextentry_var[start+7].get()
+		rise_delay=nextentry_var[start+8].get()
+		fall_delay=nextentry_var[end].get()
         	if t_delay=="": t_delay="1e-12"
 	        if enable_delay=="": enable_delay="1e-12"
         	if set_delay=="": set_delay="1e-12"
@@ -1085,7 +1312,7 @@ def AddModelParametr():
         	if reset_load=="": reset_load="1e-12"
         	if rise_delay=="": rise_delay="1e-12"
         	if fall_delay=="": fall_delay="1e-12"
-        	addmodelline=".model "+ line[3]+" d_tff(rise_delay="+rise_delay+" fall_delay="+fall_delay+" ic="+ic+"\n+t_load="+t_load+" clk_load="+clk_load+" set_load="+set_load+" reset_load="+reset_load+"\n+clk_delay="+clk_delay+" set_delay="+set_delay+" reset_delay="+reset_delay+" )"
+        	addmodelline=".model "+ line[3]+" d_tff(rise_delay="+rise_delay+" fall_delay="+fall_delay+" ic="+ic+"\n+t_load="+t_load+" clk_load="+clk_load+" set_load="+set_load+" reset_load="+reset_load+"\n+clk_delay="+clk_delay+" set_delay="+set_delay+" reset_delay="+reset_delay+")"
 		modelparamvalue.append([line[0],addmodelline,line[4]])
 	     except:
 		print "Caught an exception in d_tff model ",line[1]  
@@ -1094,7 +1321,7 @@ def AddModelParametr():
 	     try:
 		start=line[5]
 		end=line[6]
-		ic=str(nextentry_var[start].text())
+		ic=nextentry_var[start].get()
                 if ic=="": ic="0"
 		addmodelline=".ic v("+line[7]+")="+ic
         	modelparamvalue.append([line[0],addmodelline,line[4]])
@@ -1103,189 +1330,50 @@ def AddModelParametr():
 		
         else:
 	   print "No model found"
-	   QMessageBox.about(self,"Model Information","Please check whether used model is available inside code")
 	   #tkMessageBox.showinfo("Model Info","Please check whether used model is available inside code")   	
     
     print "Model List has been added",modelparamvalue  	  
 
 
-def AddSourceValue():
-    #print "Add Source Value"
-  
-    global sourcelistvalue
-    sourcelistvalue=[]	
-    global start
-    global end
-    start=0
-    end=0
-    #print "Track Source List :",sourcelisttrack
-    #print "Initial Source List Value :",sourcelistvalue	
-    for compline in sourcelisttrack:
-        print "compline ",compline
-	index=compline[0]
-	addline=schematicInfo[index]
-        #print "addline ",addline,"for index ",index	
-	if compline[1]=='sine':	
-	   try:
-	      start=compline[2]
-	      end=compline[3]
-	      vo_val=str(entry_var[start].text()) if len(str(entry_var[start].text()))>0 else '0'
-	      va_val=str(entry_var[start+1].text()) if len(str(entry_var[start+1].text()))>0 else '0'
-	      freq_val=str(entry_var[start+2].text()) if len(str(entry_var[start+2].text()))>0 else '0'
-	      td_val=str(entry_var[start+3].text()) if len(str(entry_var[start+3].text()))>0 else '0'
-	      theta_val=str(entry_var[end].text()) if len(str(entry_var[end].text()))>0 else '0'
-	      addline=addline.partition('(')[0] + "("+vo_val+" "+va_val+" "+freq_val+" "+td_val+" "+theta_val+")"
-	      #print "Line Added ",addline
-	      sourcelistvalue.append([index,addline])
-           except:
-              print "Caught an exception in sine voltage source ",addline  
-	     
-	elif compline[1]=='pulse':
-	   try:
-              print "yessss"
-	      start=compline[2]
-	      end=compline[3]
-	      v1_val=str(entry_var[start].text()) if len(str(entry_var[start].text()))>0 else '0'
-	      v2_val=str(entry_var[start+1].text()) if len(str(entry_var[start+1].text()))>0 else '0'
-	      td_val=str(entry_var[start+2].text()) if len(str(entry_var[start+2].text()))>0 else '0'
-	      tr_val=str(entry_var[start+3].text()) if len(str(entry_var[start+3].text()))>0 else '0'
-	      tf_val=str(entry_var[start+4].text()) if len(str(entry_var[start+4].text()))>0 else '0'
-	      pw_val=str(entry_var[start+5].text()) if len(str(entry_var[start+5].text()))>0 else '0'
-	      tp_val=str(entry_var[end].text()) if len(str(entry_var[end].text()))>0 else '0'
+def ClearSourceValue():
+    print "Clear Source Value"
+    for line in sourcelisttrack:
+	start=line[2]
+	end=line[3]
+	count=start
+	for item in range(int(end-start+1)):
+	    entry_var[count].set("")
+	    count=count+1
 
-	      addline=addline.partition('(')[0] + "("+v1_val+" "+v2_val+" "+td_val+" "+tr_val+" "+tf_val+" "+pw_val+" "+tp_val+")"
-	      #print "Line Added ",addline
-	      sourcelistvalue.append([index,addline])
-           except:
-	      print "Caught an exception in pulse voltage source ",addline
+def ClearModelParamValue():
+    print "Clear Model Parameter value"
+    for line in  guimodellisttrack:
+	print "line",line
+	start=line[5]
+	end=line[6]
+	count=start
+	for item in range(end-start+1):
+	    nextentry_var[count].set("")
+	    count=count+1
+	
 
-        elif compline[1]=='pwl':
-	   try:
-	     start=compline[2]
-	     t_v_val=str(entry_var[start].text()) if len(str(entry_var[start].text()))>0 else '0 0'
-	     addline=addline.partition('(')[0] + "("+t_v_val+")"
-	     #print "Line Added ",addline
-	     sourcelistvalue.append([index,addline])
-	   except:
-	     print "Caught an exception in pwl voltage source ",addline 
-               
-	elif compline[1]=='ac':
-           try:
-	      start=compline[2]
-              va_val=str(entry_var[start].text()) if len(str(entry_var[start].text()))>0 else '0'
-	      addline=' '.join(addline.split())
-              addline=addline.partition('ac')[0] +" "+'ac'+" "+ va_val
-	      #print "Line Added ",addline
-	      sourcelistvalue.append([index,addline]) 
-           except:
-	      print "Caught an exception in ac voltage source ",addline
-              
-	elif compline[1]=='dc':
-	   try:
-	      start=compline[2]
-	      v1_val=str(entry_var[start].text()) if len(str(entry_var[start].text()))>0 else '0'
-	      addline=' '.join(addline.split())	
-	      addline=addline.partition('dc')[0] + " " +'dc'+ " "+v1_val
-	      #print "Line Added ",addline
-	      sourcelistvalue.append([index,addline]) 
-           except:
-	      print "Caught an exception in dc voltage source",addline 
-            
-        elif compline[1]=='exp':
-	   try:
-	      start=compline[2]
-	      end=compline[3]
-	      v1_val=str(entry_var[start].text()) if len(str(entry_var[start].text()))>0 else '0'
-	      v2_val=str(entry_var[start+1].text()) if len(str(entry_var[start+1].text()))>0 else '0'
-	      td1_val=str(entry_var[start+2].text()) if len(str(entry_var[start+2].text()))>0 else '0'
-	      tau1_val=str(entry_var[start+3].text()) if len(str(entry_var[start+3].text()))>0 else '0'
-	      td2_val=str(entry_var[start+4].text()) if len(str(entry_var[start+4].text()))>0 else '0'
-	      tau2_val=str(entry_var[end].text()) if len(str(entry_var[end].text()))>0 else '0'
-
-	      addline=addline.partition('(')[0] + "("+v1_val+" "+v2_val+" "+td1_val+" "+tau1_val+" "+td2_val+" "+tau2_val+")"
-	      #print "Line Added ",addline
-	      sourcelistvalue.append([index,addline])
-           except:
-              print "Caught an exception in exp voltage source ",addline
-    #print "Final Source List Value :",sourcelistvalue
-    ##Adding into schematicInfo
-    for item in sourcelistvalue:
-	del schematicInfo[item[0]]
-	schematicInfo.insert(item[0],item[1])
-
-def create_ngspice_netlist():
-  #print "sche in create_ng ",schematicInfo
-  last_file=open(last_input_file,"w");
-  global spec_info
-  for info in schematicInfo:
-	spec_info=info.split()
-	if spec_info[0][0]=='v' or spec_info[0]=='.model':
-		last_file.writelines(info)
-		last_file.writelines('\n')
-
-  #Add newline in the schematic information
-  for i in range(len(schematicInfo),0,-1):
-    schematicInfo.insert(i,'\n')
-  outfile=filename+".out"
-  cktfile=filename+".ckt"
-  out=open(outfile,"w")
-  ckt=open(cktfile,"w")
-
-  out.writelines(infoline)
-  out.writelines('\n')
-  ckt.writelines(infoline)
-  ckt.writelines('\n')
-
-  for modelName in modelList:
-    if os.path.exists(modelName+".lib"):
-      out.writelines('.include '+modelName+'.lib\n')
-      ckt.writelines('.include '+modelName+'.lib\n')
-          
-  for subcktName in subcktList:
-    out.writelines('.include '+subcktName+'.sub\n')
-    ckt.writelines('.include '+subcktName+'.sub\n')
-  if finalNetlist:
-    sections=[simulatorOption, initialCondOption, schematicInfo, analysisOption]
-  else:
-    sections=[simulatorOption, initialCondOption, schematicInfo]
-  for section in sections:
-    if len(section) == 0:
-      continue
-    else:
-     out.writelines('\n')
-     out.writelines(section)
-     ckt.writelines('\n')
-     ckt.writelines(section)
-  if finalNetlist:
-    out.writelines('\n* Control Statements \n')
-    out.writelines('.control\n')
-    out.writelines('run\n')
-    out.writelines(outputOption)
-    outputOption1=[]
-    for option in outputOption:
-      if (("plot" in option) or ("print" in option)):
-        outputOption1.append("."+option)
-      else:
-        outputOption1.append(option)
-    ckt.writelines(outputOption1)
-    out.writelines('print allv > plot_data_v.txt\n')
-    out.writelines('print alli > plot_data_i.txt\n')
-    out.writelines('.endc\n')
-    out.writelines('.end\n')
-    ckt.writelines('.end\n')
-  last_file.close()
-  out.close()
-  ckt.close()
-
-  print "The ngspice netlist has been written in "+filename+".out"
-  print "The scilab netlist has been written in "+filename+".ckt"
+def Submit():
+    print "Submit button"
+    try:
+	AddModelParametr()	#Adding Model Parameter
+    	for item in modelparamvalue:
+	    schematicInfo.append(item[2])  #Adding Comment line
+	    schematicInfo.append(item[1])  #Adding Model line
+    	print "Successfully Closed"
+    	root_window.quit()
+    except:
+	tkMessageBox.showinfo("Exception","Please Add before Submit") 	
+    	
 
 
 def convertICintoBasicBlocks(schematicInfo,outputOption,guimodelvalue):
   #Insert Special source parameters
   k=1
-  #print "schematicInfo is ",schematicInfo
-  #print "guimodelvalue is ",guimodelvalue
   for compline in schematicInfo:
     words=compline.split()
     compName=words[0]
@@ -2274,422 +2362,199 @@ def convertICintoBasicBlocks(schematicInfo,outputOption,guimodelvalue):
         f = open(OSCAD_HOME)
         data = f.read()
         schematicInfo.insert(index,data)
-      elif compType=="transfo":
-        schematicInfo.append("a"+str(k)+" ("+words[1]+" "+words[2]+") (2mmf "+words[2]+") "+compName+"_primary")
-	k=k+1
-	schematicInfo.insert(index,"* "+compline)
-	print "------------------------------------------------------------"
-	Comment="*Adding transformer "+compType
-	Title="Add parameters for primary and secondary "+compName
-	num_turns="Enter the number of turns in primary (default=310):"
-	schematicInfo.append("a"+str(k)+" (2mmf 3mmf) "+compName+"_iron_core")
-	k=k+1
-	h1="Enter H value for B-H table seperated by spcae (default=blank)"
-	b1="Enter corresponding B value seperated by space (default=blank)"
-	area="Enter the cross-sectional area of the core: (default = 1)"
-	length ="Enter the core length: (default = 0.01)"
-	schematicInfo.append("a"+str(k)+" ("+words[4]+" "+words[3]+") (3mmf "+words[3]+") "+compName+"_secondary")
-	k=k+1
-	num_turns2="Enter the number of turns in secondary (default=620):"
-	guimodelvalue.append([index,compline,compType,compName,Comment,Title,num_turns,h1,b1,area,length,num_turns2])
       else: 
         schematicInfo.insert(index,compline)
     # Update option information
   return schematicInfo,outputOption,guimodelvalue
 
-def previous_file_open(filename):
-  """Read Pspice netList"""
-  # Open file if it exists
-  if os.path.exists(filename):
-    try:
-      f = open(filename)
-      global last_info
-      last_info=f.read()
-      f.close()
-      return 1;
-    except :
-      print("Error in opening file")
-      return 0;
-  else:
-    print filename + " does not exist"
-    return 0;
- 
 
-
-
-   
-def readNetlist(filename):
-  """Read Pspice netList"""
-  # Open file if it exists
-  if os.path.exists(filename):
-    try:
-      f = open(filename)
-    except :
-      print("Error in opening file")
-      sys.exit()
-  else:
-    print filename + " does not exist"
-    sys.exit()
-  # Read the data from file
-  data=f.read()
-  # Close the file
-  f.close()
-  return data.splitlines()
-
-def readParamInfo(data):
-  """Read Parameter information and store it into dictionary"""
-  print "data "
-  print data 
-  param={}
-  for eachline in lines:
-    print eachline
-    eachline=eachline.strip()
-    if len(eachline)>1:
-      words=eachline.split();
-      option=words[0].lower()
-      if option=='.param':
-        for i in range(1, len(words), 1):
-          paramList=words[i].split('=')
-          param[paramList[0]]=paramList[1]
-  return param
-
-def preprocessNetlist(lines,param):
-  """Preprocess netlist (replace parameters)"""
-  netlist=[]
-  for eachline in lines:
-  # Remove leading and trailing blanks spaces from line 
-    eachline=eachline.strip()
-  # Remove special character $
-    eachline=eachline.replace('$','')
-  # Replace parameter with values
-    for subParam in eachline.split():
-      if '}' in subParam:
-        key=subParam.split()[0]
-        key=key.strip('{')
-        key=key.strip('}')
-        if key in param:
-          eachline=eachline.replace('{'+key+'}',param[key])
-        else:
-          print "Parameter " + key +" does not exists"
-          value=raw_input('Enter parameter value: ')
-          eachline=eachline.replace('{'+key+'}',value)
-   # Convert netlist into lower case letter     
-    eachline=eachline.lower()
-   # Construct netlist
-    if len(eachline)>1:
-      if eachline[0]=='+':
-        netlist.append(netlist.pop()+eachline.replace('+',' '))
-      else:
-        netlist.append(eachline)
- # Copy information line
-  infoline=netlist[0]
-  netlist.remove(netlist[0])
-  return netlist,infoline
-
-def separateNetlistInfo(netlist):
-  optionInfo=[]
-  schematicInfo=[]
-
-  for eachline in netlist:
-    if eachline[0]=='*':
-      continue
-    elif eachline[0]=='.':
-      optionInfo.append(eachline)
-    else:
-      schematicInfo.append(eachline)
-  return optionInfo,schematicInfo
-
-def addAnalysis(optionInfo):
-  """Open file if it exists"""
-  filename="analysis"
-  if os.path.exists(filename):
-    try:
-      f = open(filename)
-    except :
-      print("Error in opening file")
-      sys.exit()
-  else:
-    print filename + " does not exist"
-    sys.exit()
-
-# Read the data from file
-  data=f.read()
-
-# Close the file
-  f.close()
-
-  analysisData=data.splitlines()
-  for eachline in analysisData:
-    eachline=eachline.strip()
-    if len(eachline)>1:
-      if eachline[0]=='.':
-        optionInfo.append(eachline)
-      else:
-        pass
-  return optionInfo
-
-
-
-
-def findCurrent(schematicInfo,outputOption):
-  #Find current through component by placing voltage source series with the component
-  i=0
-  for eachline in outputOption:
-    words=eachline.split()
-    option=words[0]
-  # Add voltage sources in series with component to find current 
-    if option=="print" or option=="plot":
-      words.remove(option)
-      updatedline=eachline
-      for outputVar in words:
-      # Find component name if output variable is current
-        if outputVar[0]=='i':
-          outputVar=outputVar.strip('i')
-          outputVar=outputVar.strip('(')
-          compName=outputVar.strip(')')
-         # If component is voltage source, skip
-          if compName[0]=='v':
-            continue
-         # Find the component from the circuit
-          for compline in schematicInfo:
-            compInfo=compline.split()
-            if compInfo[0]==compName:
-            # Construct dummy node 
-              dummyNode='dummy_'+str(i)
-              i+=1
-            # Break the one node component and place zero value voltage source in between.
-              index=schematicInfo.index(compline)
-              schematicInfo.remove(compline)
-              compline=compline.replace(compInfo[2],dummyNode)
-              schematicInfo.insert(index,compline)
-              schematicInfo.append('v'+compName+' '+dummyNode+' '+compInfo[2]+' 0')
-    # Update option information
-          updatedline=updatedline.replace('i('+compName+')','i(v'+compName+')')
-      index=outputOption.index(eachline)
-      outputOption.remove(eachline)
-      outputOption.insert(index,updatedline)
-  return schematicInfo, outputOption
-
-def insertSpecialSourceParam(schematicInfo,sourcelist):
-  #Inser Special source parameter
-  schematicInfo1=[]
-
-  for compline in schematicInfo:
-    words=compline.split()
-    compName=words[0]
-  # Ask for parameters of source
-    if compName[0]=='v' or compName=='i':
-    # Find the index component from circuit
-      index=schematicInfo.index(compline)
-      #schematicInfo.remove(compline)
-      if words[3]=="pulse":
-        Title="Add parameters for pulse source "+compName
-        v1='  Enter initial value(Volts/Amps): '
-        v2='  Enter pulsed value(Volts/Amps): '
-        td='  Enter delay time (seconds): '
-        tr='  Enter rise time (seconds): '
-        tf='  Enter fall time (seconds): '
-        pw='  Enter pulse width (seconds): '
-        tp='  Enter period (seconds): '
-        sourcelist.append([index,compline,words[3],Title,v1,v2,td,tr,tf,pw,tp])
-
-      elif words[3]=="sine":
-        Title="Add parameters for sine source "+compName
-        vo='  Enter offset value (Volts/Amps): '
-        va='  Enter amplitude (Volts/Amps): '
-        freq='  Enter frequency (Hz): '
-        td='  Enter delay time (seconds): '
-        theta='  Enter damping factor (1/seconds): '
-        sourcelist.append([index,compline,words[3],Title,vo,va,freq,td,theta])
-
-      elif words[3]=="pwl":
-        Title="Add parameters for pwl source"+compName
-        t_v=' Enter in pwl format without bracket i.e t1 v1 t2 v2.... '
-        sourcelist.append([index,compline,words[3],Title,t_v])
-
-      elif words[3]=="ac":
-        Title="Add parameters for ac source "+compName
-        v_a='  Enter amplitude (Volts/Amps): '
-        sourcelist.append([index,compline,words[3],Title,v_a])
-
-      elif words[3]=="exp":
-        Title="Add parameters for exponential source "+compName
-        v1='  Enter initial value(Volts/Amps): '
-        v2='  Enter pulsed value(Volts/Amps): '
-        td1='  Enter rise delay time (seconds): '
-        tau1='  Enter rise time constant (seconds): '
-        td2='  Enter fall time (seconds): '
-        tau2='  Enter fall time constant (seconds): '
-        sourcelist.append([index,compline,words[3],Title,v1,v2,td1,tau1,td2,tau2])
-
-      elif words[3]=="dc":
-        Title="Add parameters for DC source "+compName
-        v1='  Enter value(Volts/Amps): '
-        v2='  Enter zero frequency: '
-        sourcelist.append([index,compline,words[3],Title,v1,v2])
-      #schematicInfo.insert(index,compline)
-
-    elif compName[0]=='h' or compName[0]=='f':
-    # Find the index component from the circuit
-      index=schematicInfo.index(compline)
-      schematicInfo.remove(compline)
-      schematicInfo.insert(index,"* "+compName)
-      schematicInfo1.append("V"+compName+" "+words[3]+" "+words[4]+" 0")
-      schematicInfo1.append(compName+" "+words[1]+" "+words[2]+" "+"V"+compName+" "+words[5])
-  schematicInfo=schematicInfo+schematicInfo1
-  #print sourcelist
-  #print schematicInfo
-  return schematicInfo,sourcelist
-                                                                                              
-
-
-def main():
+			
 # Accept input file name from user if not provided
-  global lines
-  global firstwindow #for checking whether first window in closed
-  global filename
-  global infoline,backClicked,last_input_file
-  global modelList,analysisOption
-  global subcktList,finalNetlist,simulatorOption,initialCondOption
-  firstwindow=1
-  if len(sys.argv) < 2:
-    filename=raw_input('Enter file name: ')
-  else:
-    filename=sys.argv[1]
-  if len(sys.argv) < 3:
-    finalNetlist=int(raw_input('Do you want to create final file: '))
-  else:
-    finalNetlist=int(sys.argv[2])
+if len(sys.argv) < 2:
+  filename=raw_input('Enter file name: ')
+else:
+  filename=sys.argv[1]
 
-  print "=================================="
-  print "Kicad to Ngspice netlist converter "
-  print "=================================="
-  print "converting "+filename
-  last_input_file=filename[:len(filename)-4]
-  last_input_file=last_input_file+"_last_input.txt"
-  print "input_file ",last_input_file
-  global schematicInfo
-	
-  # Read the netlist
-  lines=readNetlist(filename)
-	
-  # Construct parameter information
-  param=readParamInfo(lines)
-	
-  # Replace parameter with values
-  netlist, infoline=preprocessNetlist(lines,param)
+if len(sys.argv) < 3:
+  finalNetlist=int(raw_input('Do you want to create final file: '))
+else:
+  finalNetlist=int(sys.argv[2])
+
+print "=================================="
+print "Kicad to Ngspice netlist converter "
+print "=================================="
+print "converting "+filename
+
+# Read the netlist
+lines=readNetlist(filename)
+
+# Construct parameter information
+param=readParamInfo(lines)
+
+# Replace parameter with values
+netlist, infoline=preprocessNetlist(lines,param)
 
 
-  # Separate option and schematic information
-  optionInfo, schematicInfo=separateNetlistInfo(netlist)
-	
-  if finalNetlist:
-    """Insert analysis from file"""
-    optionInfo=addAnalysis(optionInfo)
-    #print optionInfo
-  # Find the analysis option
-  analysisOption=[]
-  outputOption=[]
-  initialCondOption=[]
-  simulatorOption=[]
-  includeOption=[]
-  model=[]
+# Separate option and schematic information
+optionInfo, schematicInfo=separateNetlistInfo(netlist)
 
-  for eachline in optionInfo:
-    words=eachline.split()
-    option=words[0]
-    if (option=='.ac' or option=='.dc' or option=='.disto' or option=='.noise' or
-     option=='.op' or option=='.pz' or option=='.sens' or option=='.tf' or option=='.tran'):
-      analysisOption.append(eachline+'\n')
-      #print eachline
-    elif (option=='.save' or option=='.print' or option=='.plot' or option=='.four'):
-      eachline=eachline.strip('.')
-      outputOption.append(eachline+'\n')
-    elif (option=='.nodeset' or option=='.ic'):
-      initialCondOption.append(eachline+'\n')
-    elif option=='.option':
-      simulatorOption.append(eachline+'\n')
-    elif (option=='.include' or option=='.lib'):
-      includeOption.append(eachline+'\n')
-    elif (option=='.model'):
-      model.append(eachline+'\n')
-    elif option=='.end':
-      continue;
-  # Find the various model library required
-  modelList=[]
-  subcktList=[]
- 
-  for eachline in schematicInfo:
-    words=eachline.split()
-    if eachline[0]=='d':
-      modelName=words[3]
-      if modelName in modelList:
-        continue
-      modelList.append(modelName)
-    elif eachline[0]=='q':
-      modelName=words[4]
-      index=schematicInfo.index(eachline)
-      schematicInfo.remove(eachline)
-      schematicInfo.insert(index,words[0]+" "+words[3]+" "+words[2]+" "+words[1]+" "+words[4])
-      if modelName in modelList:
-         continue
-      modelList.append(modelName)
-    elif eachline[0]=='m':
-      modelName=words[4]
-      index=schematicInfo.index(eachline)
-      schematicInfo.remove(eachline)
-      width=raw_input('  Enter width of mosfet '+words[0]+'(default=100u):')
-      length=raw_input('  Enter length of mosfet '+words[0]+'(default=100u):')
-      multiplicative_factor=raw_input('  Enter multiplicative factor of mosfet '+words[0]+'(default=1):')
-      if width=="": width="100u"
-      if multiplicative_factor=="": multiplicative_factor="100u"
-      if length=="": length="100u"
-      schematicInfo.insert(index,words[0]+" "+words[1]+" "+words[2]+" "+words[3]+" "+words[3]+" "+words[4]+" "+'M='+multiplicative_factor+" "+'L='+length+" "+'W='+width)
-      if modelName in modelList:
-         continue
-      modelList.append(modelName)
-    elif eachline[0]=='j':
-      modelName=words[4]
-      index=schematicInfo.index(eachline)
-      schematicInfo.remove(eachline)
-      schematicInfo.insert(index,words[0]+" "+words[1]+" "+words[2]+" "+words[3]+" "+words[4])
-      if modelName in modelList:
+if finalNetlist:
+  """Insert analysis from file"""
+  optionInfo=addAnalysis(optionInfo)
+  
+# Find the analysis option
+analysisOption=[]
+outputOption=[]
+initialCondOption=[]
+simulatorOption=[]
+includeOption=[]
+model=[]
+
+for eachline in optionInfo:
+  words=eachline.split()
+  option=words[0]
+  if (option=='.ac' or option=='.dc' or 
+      option=='.disto' or option=='.noise' or
+      option=='.op' or option=='.pz' or
+      option=='.sens' or option=='.tf' or
+      option=='.tran'):
+    analysisOption.append(eachline+'\n')
+    print eachline
+  elif (option=='.save' or option=='.print' or 
+      option=='.plot' or option=='.four'):
+    eachline=eachline.strip('.')
+    outputOption.append(eachline+'\n')
+  elif (option=='.nodeset' or option=='.ic'):  
+    initialCondOption.append(eachline+'\n')
+  elif option=='.option':  
+    simulatorOption.append(eachline+'\n')
+  elif (option=='.include' or option=='.lib'):
+    includeOption.append(eachline+'\n')
+  elif (option=='.model'):
+    model.append(eachline+'\n')
+  elif option=='.end':
+    continue;
+
+
+# Find the various model library required
+modelList=[]
+subcktList=[]
+
+for eachline in schematicInfo:
+  words=eachline.split()
+  if eachline[0]=='d':
+    modelName=words[3]
+    if modelName in modelList:
+      continue
+    modelList.append(modelName)
+  elif eachline[0]=='q':
+    modelName=words[4]
+    index=schematicInfo.index(eachline)
+    schematicInfo.remove(eachline)
+    schematicInfo.insert(index,words[0]+" "+words[3]+" "+words[2]+" "+words[1]+" "+words[4])
+    if modelName in modelList:
        continue
-      modelList.append(modelName)
-    elif eachline[0]=='x':
-      subcktName=words[len(words)-1]
-      if subcktName in subcktList:
-        continue
-      subcktList.append(subcktName)
-  
-  # Find current through components
-  schematicInfo,outputOption=findCurrent(schematicInfo,outputOption)
+    modelList.append(modelName)       
+  elif eachline[0]=='m':
+    modelName=words[4]
+    index=schematicInfo.index(eachline)
+    schematicInfo.remove(eachline)
+    width=raw_input('  Enter width of mosfet '+words[0]+'(default=100u):')
+    length=raw_input('  Enter length of mosfet '+words[0]+'(default=100u):')
+    multiplicative_factor=raw_input('  Enter multiplicative factor of mosfet '+words[0]+'(default=1):')
+    if width=="": width="100u"
+    if multiplicative_factor=="": multiplicative_factor="100u"
+    if length=="": length="100u"
+    schematicInfo.insert(index,words[0]+" "+words[1]+" "+words[2]+" "+words[3]+" "+words[3]+" "+words[4]+" "+'M='+multiplicative_factor+" "+'L='+length+" "+'W='+width)
+    if modelName in modelList:
+       continue
+    modelList.append(modelName)       
+  elif eachline[0]=='j':
+    modelName=words[4]
+    index=schematicInfo.index(eachline)
+    schematicInfo.remove(eachline)
+    schematicInfo.insert(index,words[0]+" "+words[1]+" "+words[2]+" "+words[3]+" "+words[4])
+    if modelName in modelList:
+       continue
+    modelList.append(modelName)
+  elif eachline[0]=='x':
+    subcktName=words[len(words)-1]
+    if subcktName in subcktList:
+      continue
+    subcktList.append(subcktName)
+  	
 
-  #List for storing source and its value
-  global sourcelisttrack
-  sourcelist=[]
-  sourcelisttrack=[]
-  
-  # Add parameter to sources
-  schematicInfo,sourcelist=insertSpecialSourceParam(schematicInfo,sourcelist)
+# Find current through components
+schematicInfo,outputOption=findCurrent(schematicInfo,outputOption)
 
-  sourcelist,sourcelisttrack=w.createrootwindow(sourcelist,sourcelisttrack)
-  
-
-  
-  #print "Output Option",outputOption
-  #print "Sch Info",schematicInfo
-  #print "Src List",sourcelist
-  #print "Src Track",sourcelisttrack
+#List for storing source and its value
+sourcelist=[]
+sourcelisttrack=[]
 
 
+# Add parameter to sources
+schematicInfo,sourcelist=insertSpecialSourceParam(schematicInfo,sourcelist)
 
-if __name__=='__main__':
-  app=QtGui.QApplication(sys.argv)
-  global w
-  global nw
-  w=Window()
-  nw=NewWindow() 
-  nw.close()
-  main()
-  sys.exit(app.exec_())
+#Calling createrootwindow
+sourcelist,sourcelisttrack=createrootwindow(sourcelist,sourcelisttrack)
+print "Output Option",outputOption
+print schematicInfo
+
+
+# Add newline in the schematic information
+for i in range(len(schematicInfo),0,-1):
+  schematicInfo.insert(i,'\n')
+
+outfile=filename+".out"
+cktfile=filename+".ckt"
+out=open(outfile,"w")
+ckt=open(cktfile,"w")
+out.writelines(infoline)
+out.writelines('\n')
+ckt.writelines(infoline)
+ckt.writelines('\n')
+
+for modelName in modelList:
+  if os.path.exists(modelName+".lib"):
+    out.writelines('.include '+modelName+'.lib\n')
+    ckt.writelines('.include '+modelName+'.lib\n')
+
+for subcktName in subcktList:
+  out.writelines('.include '+subcktName+'.sub\n')
+  ckt.writelines('.include '+subcktName+'.sub\n')
+
+if finalNetlist:
+  sections=[simulatorOption, initialCondOption, schematicInfo, analysisOption]
+else:
+  sections=[simulatorOption, initialCondOption, schematicInfo]
+for section in sections:
+  if len(section) == 0:
+    continue
+  else:
+   out.writelines('\n') 
+   out.writelines(section)
+   ckt.writelines('\n') 
+   ckt.writelines(section)
+
+if finalNetlist:
+  out.writelines('\n* Control Statements \n')
+  out.writelines('.control\n')
+  out.writelines('run\n')
+  out.writelines(outputOption)
+  outputOption1=[]
+  for option in outputOption:
+    if (("plot" in option) or ("print" in option)):
+      outputOption1.append("."+option)
+    else:
+      outputOption1.append(option)
+  ckt.writelines(outputOption1)
+  out.writelines('.endc\n')
+  out.writelines('.end\n')
+  ckt.writelines('.end\n')
+
+out.close()
+ckt.close()
+
+print "The ngspice netlist has been written in "+filename+".out"
+print "The scilab netlist has been written in "+filename+".ckt"
+#dummy=raw_input('Press Enter to quit')
