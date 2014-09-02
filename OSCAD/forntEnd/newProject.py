@@ -21,8 +21,6 @@ import selectOption
 from string import maketrans
 from PIL import Image, ImageTk
 
-
-
 class ProjectInfo(template.MyTemplate):
   """ Class for accept model information from  user """
   def body(self, master):
@@ -317,6 +315,16 @@ class ProjectParam(template.MyTemplate):
         print err
     self.text.insert(END, "Select a tool from tool menu\n")
     self.text.yview(END)
+
+    # opening pythonplotting:
+    command ="python " + self.OSCAD_HOME+"/forntEnd/pythonPlotting.py "+os.getcwd()+" "+self.projectName
+
+    try:
+        thread.start_new_thread(self.call_system,(command,))
+    except Exception,err:
+        print err
+
+    
 
   def openSMCSim(self,e=None):
     self.text.insert(END, "  Running scilab based circuit simulator .........\n")
