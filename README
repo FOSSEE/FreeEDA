@@ -1,12 +1,12 @@
 Read Me:
 --------
 
-Download and extract OSCAD_installer.tar.gz to your PC/Laptop's Desktop. Make the installation files executable by doing the following:
+Download and extract FreeEDA_installer.tar.gz to your PC/Laptop's Desktop. Make the installation files executable by doing the following:
 
 1. Open the terminal
 2. Type the following:
     cd Desktop
-    sudo chmod -R 777 OSCAD_installer 
+    sudo chmod -R 777 FreeEDA_installer 
     Give the root password when prompted
 
-Now follow the instructions given in the Spoken tutorial "Introduction to Oscad" to install Oscad.
+Now follow the instructions given in the Spoken tutorial "Introduction to FreeEDA" to install FreeEDA.

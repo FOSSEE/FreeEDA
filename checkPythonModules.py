@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# checkPythonModule.py is a python script file to check python modules required for OSCAD software. It is written by Yogesh Dilip Save (yogessave@gmail.com).  
+# checkPythonModule.py is a python script file to check python modules required for FreeEDA software. It is written by Yogesh Dilip Save (yogessave@gmail.com).  
 # Copyright (C) 2012 Yogesh Dilip Save, FOSS Project, IIT Bombay.
 # This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
 # This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
@@ -31,7 +31,7 @@ def checkPackage(package):
     lines = lines.split("\n")
     if lines[0] != '0':	
       print "Unable to find "+packageName
-      print "Please re-run the ./installOSCAD.sh If you are getting this error first time"
+      print "Please re-run the ./installFreeEDA.sh If you are getting this error first time"
       print '\033[91m'+ "  Please Install Python Library: " + libraryName + " using package manager"+ '\033[0m' 
       exit(1)
 
@@ -42,7 +42,7 @@ def checkPackage(package):
       __import__(packageName)
     except ImportError:
       print "Unable to find "+packageName
-      print "Please re-run the ./installOSCAD.sh If you are getting this error first time"
+      print "Please re-run the ./installFreeEDA.sh If you are getting this error first time"
       print '\033[91m'+ "  Please Install Python Library: " + libraryName + " using package manager"+ '\033[0m' 
       exit(1)'''
   print "  Found python module: " +packageName

@@ -1,4 +1,4 @@
-// installMetanet.sci is a scilab file to install metanet library in the installed version of scilab. It is developed for OSCAD software installation. It is written by Yogesh Dilip Save (yogessave@gmail.com).  
+// installMetanet.sci is a scilab file to install metanet library in the installed version of scilab. It is developed for FreeEDA software installation. It is written by Yogesh Dilip Save (yogessave@gmail.com).  
 // Copyright (C) 2012 Yogesh Dilip Save, FOSS Project, IIT Bombay.
 // This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
 // This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
