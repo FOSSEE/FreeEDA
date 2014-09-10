@@ -1,0 +1,15 @@
+Read Me: 
+This instructions are for windows version. 
+
+0. First download windows version of FreeEDA from website.
+
+Now to get latest changes from git hub which is not available in the website please do the following steps.
+
+1. Download it from github as zip file to your PC/Laptop's Desktop. Make sure name of zip file is FreeEDA.zip
+2. If zip file is not with the proper name just extract it and compress it again with proper name i.e FreeEDA.zip 
+3. Now replace your windows version of FreeEDA.zip (which can be found under resource folder) with your FreeEDA.zip downloaded from git. 
+
+
+
+         
+Note : For more infomation please visit http://freeeda.in and video tutorial please visit http://spoken-tutorial.org/
