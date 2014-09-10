@@ -1,0 +1,6 @@
+* Diode in forward biased
+V1 1 0 dc 1
+D1 1 2 mymodel (1e-8 0.026) 
+R1 2 0 100
+.op
+.end

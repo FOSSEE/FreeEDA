@@ -1,0 +1,400 @@
+PCBNEW-BOARD Version 1 date Friday 28 September 2012 10:42:25 AM IST
+
+# Created by Pcbnew(2011-05-25)-stable
+
+$GENERAL
+encoding utf-8
+LayerCount 2
+Ly 1FFF8001
+EnabledLayers 1FFF8001
+Links 7
+NoConn 7
+Di 40017 31950 63751 53251
+Ndraw 0
+Ntrack 0
+Nzone 0
+BoardThickness 630
+Nmodule 7
+Nnets 7
+$EndGENERAL
+
+$SHEETDESCR
+Sheet A4 11700 8267
+Title ""
+Date "28 sep 2012"
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndSHEETDESCR
+
+$SETUP
+InternalUnit 0.000100 INCH
+Layers 2
+Layer[0] Back signal
+Layer[15] Front signal
+TrackWidth 80
+TrackClearence 100
+ZoneClearence 200
+TrackMinWidth 80
+DrawSegmWidth 150
+EdgeSegmWidth 150
+ViaSize 350
+ViaDrill 250
+ViaMinSize 350
+ViaMinDrill 200
+MicroViaSize 200
+MicroViaDrill 50
+MicroViasAllowed 0
+MicroViaMinSize 200
+MicroViaMinDrill 50
+TextPcbWidth 120
+TextPcbSize 600 800
+EdgeModWidth 150
+TextModSize 600 600
+TextModWidth 120
+PadSize 600 600
+PadDrill 320
+Pad2MaskClearance 100
+AuxiliaryAxisOrg 0 0
+PcbPlotParams (pcbplotparams (layerselection 3178497) (usegerberextensions true) (excludeedgelayer true) (linewidth 60) (plotframeref false) (viasonmask false) (mode 1) (useauxorigin false) (hpglpennumber 1) (hpglpenspeed 20) (hpglpendiameter 15) (hpglpenoverlay 2) (pscolor true) (psnegative false) (psa4output false) (plotreference true) (plotvalue true) (plotothertext true) (plotinvisibletext false) (padsonsilk false) (subtractmaskfromsilk false) (outputformat 1) (mirror false) (drillshape 1) (scaleselection 1) (outputdirectory ""))
+$EndSETUP
+
+$EQUIPOT
+Na 0 ""
+St ~
+$EndEQUIPOT
+$EQUIPOT
+Na 1 "GND"
+St ~
+$EndEQUIPOT
+$EQUIPOT
+Na 2 "N-000001"
+St ~
+$EndEQUIPOT
+$EQUIPOT
+Na 3 "N-000004"
+St ~
+$EndEQUIPOT
+$EQUIPOT
+Na 4 "N-000005"
+St ~
+$EndEQUIPOT
+$EQUIPOT
+Na 5 "N-000006"
+St ~
+$EndEQUIPOT
+$EQUIPOT
+Na 6 "VCC"
+St ~
+$EndEQUIPOT
+$NCLASS
+Name "Default"
+Desc "This is the default net class."
+Clearance 100
+TrackWidth 80
+ViaDia 350
+ViaDrill 250
+uViaDia 200
+uViaDrill 50
+AddNet ""
+AddNet "GND"
+AddNet "N-000001"
+AddNet "N-000004"
+AddNet "N-000005"
+AddNet "N-000006"
+AddNet "VCC"
+$EndNCLASS
+$MODULE R1
+Po 47000 39000 0 15 00200000 50653175 ~~
+Li R1
+Cd Resistance verticale
+Kw R
+Sc 50653175
+AR /505C9F25
+Op A A 0
+T0 -400 1000 550 500 0 80 N V 21 N "R1"
+T1 -450 1000 550 500 0 80 N I 21 N "1000"
+DS -500 0 500 0 150 21
+DC -500 0 -250 500 150 21
+$PAD
+Sh "1" C 550 550 0 0 0
+Dr 320 0 0
+At STD N 00E0FFFF
+Ne 5 "N-000006"
+Po -500 0
+$EndPAD
+$PAD
+Sh "2" C 550 550 0 0 0
+Dr 320 0 0
+At STD N 00E0FFFF
+Ne 1 "GND"
+Po 500 0
+$EndPAD
+$SHAPE3D
+Na "discret/verti_resistor.wrl"
+Sc 1.000000 1.000000 1.000000
+Of 0.000000 0.000000 0.000000
+Ro 0.000000 0.000000 0.000000
+$EndSHAPE3D
+$EndMODULE  R1
+$MODULE R1
+Po 46000 43000 0 15 00200000 50653177 ~~
+Li R1
+Cd Resistance verticale
+Kw R
+Sc 50653177
+AR /50652FB6
+Op A A 0
+T0 -400 1000 550 500 0 80 N V 21 N "R2"
+T1 -450 1000 550 500 0 80 N I 21 N "R"
+DS -500 0 500 0 150 21
+DC -500 0 -250 500 150 21
+$PAD
+Sh "1" C 550 550 0 0 0
+Dr 320 0 0
+At STD N 00E0FFFF
+Ne 2 "N-000001"
+Po -500 0
+$EndPAD
+$PAD
+Sh "2" C 550 550 0 0 0
+Dr 320 0 0
+At STD N 00E0FFFF
+Ne 1 "GND"
+Po 500 0
+$EndPAD
+$SHAPE3D
+Na "discret/verti_resistor.wrl"
+Sc 1.000000 1.000000 1.000000
+Of 0.000000 0.000000 0.000000
+Ro 0.000000 0.000000 0.000000
+$EndSHAPE3D
+$EndMODULE  R1
+$MODULE DIP-14__300_ELL
+Po 52500 34000 0 15 00200000 50653178 ~~
+Li DIP-14__300_ELL
+Cd 14 pins DIL package, elliptical pads
+Kw DIL
+Sc 50653178
+AR /505FDE5C
+Op 0 0 0
+T0 -2000 -500 600 450 0 113 N V 21 N "U2"
+T1 500 500 600 450 0 113 N V 21 N "74HC04"
+DS -4000 -1000 4000 -1000 150 21
+DS 4000 1000 -4000 1000 150 21
+DS -4000 1000 -4000 -1000 150 21
+DS -4000 -500 -3500 -500 150 21
+DS -3500 -500 -3500 500 150 21
+DS -3500 500 -4000 500 150 21
+DS 4000 -1000 4000 1000 150 21
+$PAD
+Sh "1" R 620 900 0 0 0
+Dr 320 0 0
+At STD N 00E0FFFF
+Ne 4 "N-000005"
+Po -3000 1500
+$EndPAD
+$PAD
+Sh "2" O 620 900 0 0 0
+Dr 320 0 0
+At STD N 00E0FFFF
+Ne 3 "N-000004"
+Po -2000 1500
+$EndPAD
+$PAD
+Sh "3" O 620 900 0 0 0
+Dr 320 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po -1000 1500
+$EndPAD
+$PAD
+Sh "4" O 620 900 0 0 0
+Dr 320 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po 0 1500
+$EndPAD
+$PAD
+Sh "5" O 620 900 0 0 0
+Dr 320 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po 1000 1500
+$EndPAD
+$PAD
+Sh "6" O 620 900 0 0 0
+Dr 320 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po 2000 1500
+$EndPAD
+$PAD
+Sh "7" O 620 900 0 0 0
+Dr 320 0 0
+At STD N 00E0FFFF
+Ne 1 "GND"
+Po 3000 1500
+$EndPAD
+$PAD
+Sh "8" O 620 900 0 0 0
+Dr 320 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po 3000 -1500
+$EndPAD
+$PAD
+Sh "9" O 620 900 0 0 0
+Dr 320 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po 2000 -1500
+$EndPAD
+$PAD
+Sh "10" O 620 900 0 0 0
+Dr 320 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po 1000 -1500
+$EndPAD
+$PAD
+Sh "11" O 620 900 0 0 0
+Dr 320 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po 0 -1500
+$EndPAD
+$PAD
+Sh "12" O 620 900 0 0 0
+Dr 320 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po -1000 -1500
+$EndPAD
+$PAD
+Sh "13" O 620 900 0 0 0
+Dr 320 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po -2000 -1500
+$EndPAD
+$PAD
+Sh "14" O 620 900 0 0 0
+Dr 320 0 0
+At STD N 00E0FFFF
+Ne 6 "VCC"
+Po -3000 -1500
+$EndPAD
+$SHAPE3D
+Na "dil/dil_14.wrl"
+Sc 1.000000 1.000000 1.000000
+Of 0.000000 0.000000 0.000000
+Ro 0.000000 0.000000 0.000000
+$EndSHAPE3D
+$EndMODULE  DIP-14__300_ELL
+$MODULE 2PIN_6mm
+Po 55000 50500 0 15 00200000 50653179 ~~
+Li 2PIN_6mm
+Cd module 2 pin (trou 6 mm)
+Kw DEV
+Sc 50653179
+AR /505C9ECF
+Op 0 0 0
+T0 0 500 600 600 0 120 N V 21 N "v1"
+T1 0 -500 600 600 0 120 N V 21 N "PULSE"
+DS -8500 -2500 8500 -2500 150 21
+DS 8500 -2500 8500 2500 150 21
+DS 8500 2500 -8500 2500 150 21
+DS -8500 2500 -8500 -2500 150 21
+$PAD
+Sh "1" C 4000 4000 0 0 0
+Dr 2400 0 0
+At STD N 00E0FFFF
+Ne 5 "N-000006"
+Po -5900 0
+$EndPAD
+$PAD
+Sh "2" C 4000 4000 0 0 0
+Dr 2400 0 0
+At STD N 00E0FFFF
+Ne 1 "GND"
+Po 5900 0
+$EndPAD
+$SHAPE3D
+Na "device/douille_4mm(red).wrl"
+Sc 1.800000 1.800000 1.800000
+Of -0.590000 0.000000 0.000000
+Ro 0.000000 0.000000 0.000000
+$EndSHAPE3D
+$SHAPE3D
+Na "device/douille_4mm(red).wrl"
+Sc 1.800000 1.800000 1.800000
+Of 0.590000 0.000000 0.000000
+Ro 0.000000 0.000000 0.000000
+$EndSHAPE3D
+$EndMODULE  2PIN_6mm
+$MODULE 1pin
+Po 50000 44000 0 15 00200000 5065317A ~~
+Li 1pin
+Cd module 1 pin (ou trou mecanique de percage)
+Kw DEV
+Sc 5065317A
+AR /505FD8A0
+Op 0 0 0
+T0 0 -1200 400 400 0 100 N V 21 N "U1"
+T1 0 1100 400 400 0 100 N I 21 N "ADC"
+DC 0 0 0 -900 150 21
+$PAD
+Sh "1" C 1600 1600 0 0 0
+Dr 1200 0 0
+At STD N 00E0FFFF
+Ne 5 "N-000006"
+Po 0 0
+$EndPAD
+$EndMODULE  1pin
+$MODULE 1pin
+Po 59500 43500 0 15 00200000 5065317C ~~
+Li 1pin
+Cd module 1 pin (ou trou mecanique de percage)
+Kw DEV
+Sc 5065317C
+AR /505FDC21
+Op 0 0 0
+T0 0 -1200 400 400 0 100 N V 21 N "U3"
+T1 0 1100 400 400 0 100 N I 21 N "DAC"
+DC 0 0 0 -900 150 21
+$PAD
+Sh "1" C 1600 1600 0 0 0
+Dr 1200 0 0
+At STD N 00E0FFFF
+Ne 3 "N-000004"
+Po 0 0
+$EndPAD
+$EndMODULE  1pin
+$MODULE 1pin
+Po 41500 45500 0 15 00200000 5065317E ~~
+Li 1pin
+Cd module 1 pin (ou trou mecanique de percage)
+Kw DEV
+Sc 5065317E
+AR /5061678B
+Op 0 0 0
+T0 0 -1200 400 400 0 100 N V 21 N "U4"
+T1 0 1100 400 400 0 100 N I 21 N "VPLOT1"
+DC 0 0 0 -900 150 21
+$PAD
+Sh "1" C 1600 1600 0 0 0
+Dr 1200 0 0
+At STD N 00E0FFFF
+Ne 5 "N-000006"
+Po 0 0
+$EndPAD
+$EndMODULE  1pin
+$TRACK
+$EndTRACK
+$ZONE
+$EndZONE
+$EndBOARD

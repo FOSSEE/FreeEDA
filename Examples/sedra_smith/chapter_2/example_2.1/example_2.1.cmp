@@ -1,0 +1,38 @@
+Cmp-Mod V01 Created by CvPcb (2012-apr-16-27)-stable date = Friday 12 April 2013 02:41:23 PM IST
+
+BeginCmp
+TimeStamp = /5166A210;
+Reference = D1;
+ValeurCmp = DIODE;
+IdModule  = ;
+EndCmp
+
+BeginCmp
+TimeStamp = /5166A1EB;
+Reference = R1;
+ValeurCmp = 100;
+IdModule  = ;
+EndCmp
+
+BeginCmp
+TimeStamp = /5166A34A;
+Reference = U1;
+ValeurCmp = IPLOT;
+IdModule  = ;
+EndCmp
+
+BeginCmp
+TimeStamp = /5166A1AC;
+Reference = v1;
+ValeurCmp = SINE;
+IdModule  = R1;
+EndCmp
+
+BeginCmp
+TimeStamp = /5166A26E;
+Reference = v2;
+ValeurCmp = 12V;
+IdModule  = R1;
+EndCmp
+
+EndListe

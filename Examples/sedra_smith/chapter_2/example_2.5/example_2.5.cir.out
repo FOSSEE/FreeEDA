@@ -1,0 +1,20 @@
+* eeschema netlist version 1.1 (spice format) creation date: tuesday 14 may 2013 02:41:09 pm ist
+.include diode.lib
+
+v1  1 0 dc 5
+* Plotting option vplot8_1
+V_u2 4 0 0
+r2  3 2 20m
+v2  2 4 65m
+r1  1 5 1000
+d1  5 3 diode
+
+.dc  v1 0e-00 5e-00 1e-00
+
+* Control Statements 
+.control
+run
+plot v(5) 
+plot i(V_u2)
+.endc
+.end

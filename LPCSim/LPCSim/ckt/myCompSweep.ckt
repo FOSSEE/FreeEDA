@@ -1,0 +1,6 @@
+V1 1 0 sweep 0
+R1 1 2 1
+X2 2 0 myR (1)
+.dc 0 5 0.1
+.plot v(1) v(2) 
+.end

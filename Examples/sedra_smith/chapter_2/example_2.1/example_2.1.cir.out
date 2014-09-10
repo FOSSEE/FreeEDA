@@ -1,0 +1,16 @@
+* eeschema netlist version 1.1 (spice format) creation date: monday 15 april 2013 12:08:03 pm ist
+
+v2  1 0 dc 12
+V_u1 3 1 0
+d1  5 3 diode
+r1  2 5 100
+v1  2 0 sine(0 24 50 0 0)
+
+.tran 10e-03 1e-01 0e-00
+
+* Control Statements 
+.control
+run
+plot i(V_u1)
+.endc
+.end

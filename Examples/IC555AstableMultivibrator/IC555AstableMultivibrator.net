@@ -1,0 +1,110 @@
+# EESchema Netlist Version 1.1 created  Tuesday 02 April 2013 02:47:19 PM IST
+(
+ ( /50C55B25 $noname  U2 IC {Lib=IC}
+  (    1 N-000004 )
+ )
+ ( /50C4B392 $noname  U1 VPLOT8_1 {Lib=VPLOT8_1}
+  (    1 N-000004 )
+  (    2 N-000005 )
+ )
+ ( /50A93C56 R1  v1 5 {Lib=DC}
+  (    1 VCC )
+  (    2 GND )
+ )
+ ( /50A93BFE $noname  R3 1000 {Lib=R}
+  (    1 N-000005 )
+  (    2 GND )
+ )
+ ( /50A93ACA $noname  C2 0.01e-6 {Lib=C}
+  (    1 N-000002 )
+  (    2 GND )
+ )
+ ( /50A93893 $noname  C1 100e-12 {Lib=CP}
+  (    1 N-000004 )
+  (    2 GND )
+ )
+ ( /50A93858 $noname  R2 10000 {Lib=R}
+  (    1 N-000006 )
+  (    2 N-000004 )
+ )
+ ( /50A93852 $noname  R1 1000 {Lib=R}
+  (    1 VCC )
+  (    2 N-000006 )
+ )
+ ( /50A937B9 $noname  X1 LM555N {Lib=LM555N}
+  (    1 GND )
+  (    2 N-000004 )
+  (    3 N-000005 )
+  (    4 VCC )
+  (    5 N-000002 )
+  (    6 N-000004 )
+  (    7 N-000006 )
+  (    8 VCC )
+ )
+)
+*
+{ Allowed footprints by component:
+$component v1
+ 1_pin
+$endlist
+$component R3
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component C2
+ SM*
+ C?
+ C1-1
+$endlist
+$component C1
+ CP*
+ SM*
+$endlist
+$component R2
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R1
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$endfootprintlist
+}
+{ Pin List by Nets
+Net 1 "GND" "GND"
+ C1 2
+ C2 2
+ X1 1
+ R3 2
+ v1 2
+Net 2 "" ""
+ X1 5
+ C2 1
+Net 3 "VCC" "VCC"
+ X1 4
+ R1 1
+ X1 8
+ v1 1
+Net 4 "" ""
+ U2 1
+ U1 1
+ C1 1
+ X1 6
+ R2 2
+ X1 2
+Net 5 "" ""
+ R3 1
+ U1 2
+ X1 3
+Net 6 "" ""
+ X1 7
+ R1 2
+ R2 1
+}
+#End

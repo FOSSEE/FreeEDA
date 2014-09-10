@@ -1,0 +1,77 @@
+# EESchema Netlist Version 1.1 created  Friday 28 September 2012 12:26:55 PM IST
+(
+ ( /50653344 $noname  U5 VPLOT1 {Lib=VPLOT1}
+  (    1 N-000005 )
+ )
+ ( /50652FB6 $noname  R2 1000 {Lib=R}
+  (    1 N-000005 )
+  (    2 GND )
+ )
+ ( /5061678B $noname  U4 VPLOT1 {Lib=VPLOT1}
+  (    1 N-000001 )
+ )
+ ( /505FDE5C $noname  U2 74HC04 {Lib=74HC04}
+  (    1 N-000006 )
+  (    2 N-000004 )
+  (    7 GND )
+  (   14 VCC )
+ )
+ ( /505FDC21 $noname  U3 DAC {Lib=DAC}
+  (    1 N-000004 )
+  (    2 N-000005 )
+ )
+ ( /505FD8A0 $noname  U1 ADC {Lib=ADC}
+  (    1 N-000001 )
+  (    2 N-000006 )
+ )
+ ( /505C9F25 $noname  R1 1000 {Lib=R}
+  (    1 N-000001 )
+  (    2 GND )
+ )
+ ( /505C9ECF $noname  v1 PULSE {Lib=PULSE}
+  (    1 N-000001 )
+  (    2 GND )
+ )
+)
+*
+{ Allowed footprints by component:
+$component R2
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R1
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component v1
+ 1_pin
+$endlist
+$endfootprintlist
+}
+{ Pin List by Nets
+Net 1 "" ""
+ U1 1
+ v1 1
+ R1 1
+ U4 1
+Net 2 "GND" "GND"
+ v1 2
+ R2 2
+ R1 2
+ U2 7
+Net 4 "" ""
+ U2 2
+ U3 1
+Net 5 "" ""
+ U3 2
+ U5 1
+ R2 1
+Net 6 "" ""
+ U1 2
+ U2 1
+}
+#End

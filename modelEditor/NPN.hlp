@@ -1,0 +1,17 @@
+1) 	BF 		Forward active current gain 
+2) 	VJE 		Base-emitter built-in potential
+3) 	BR 		Reverse active current gain 
+4) 	VJC 		Base-collector built-in potential
+5) 	IS 		Transport saturation current 
+6) 	VAF 		Forward mode Early voltage
+7) 	CJE 		Base-emitter zero-bias Junction capacitance
+8) 	VAR 		Reverse mode Early voltage
+9) 	NF 		Forward mode ideality factor
+10)	CJC 		Base-collector zero-bias Junction capacitance 
+11)	NR 		Reverse mode ideality factor
+12) 	RB 		zero bias base resistance 
+13)	MJE 		base-emitter capacitance exponent
+14)	RE 		emitter resistance 
+15)	MJC 		base-collector capacitance exponent
+16)	RC 		collector resistance 
+17)	EG 		energy gap for temperature effect on IS

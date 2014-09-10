@@ -1,0 +1,208 @@
+\documentclass[a4paper,10pt]{report}
+\pagestyle{plain}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{algorithmic}
+% Title Page
+\title{MiniSim}
+\author{Yogesh Dilip Save}
+
+\begin{document}
+\maketitle
+\chapter*{Introduction}
+MiniSim is a circuit simulator to assist students in improving their knowledge in field of circuit simulation. The purpose of this project is not only to improve the understanding of student toward building simulator but also add some features which are not available in commercial simulator.
+
+\section*{Features}
+Analysis Options
+\begin{enumerate}
+\item Operating Point Analysis
+\item DC Analysis
+\item Transient Analysis 
+\end{enumerate}
+Devices Suported
+\begin{enumerate}
+\item All linear components (Resistances, Independent voltage and current sources, controlled sources).
+\item Non-linear components (Diode)
+\item User Defined Non-linear component
+\item Time Dependent Component (Capacitor)
+\item MOSFET
+\end{enumerate}
+
+\chapter*{User Defined Components}
+How to define a new component?
+\par
+Consider, a non-linear resistance,
+$$I=\frac{1}{R}V^2$$
+
+It is two step processs:
+\begin{enumerate}
+\item Create  a file \$CompName.sci
+\item Define 
+\begin{enumerate}
+\item Function in the $i=g(v)$ form
+\item Jacobian of the function 
+\end{enumerate}
+\end{enumerate}
+
+{\bf Syntax:-}
+\newline 
+function I=\$CompName\_func(voltage,parameter)
+\$par\_2=parameter(2)
+\$par\_3=parameter(3)
+
+\chapter*{Algorithms}
+{\bf Circuit Simulator} (Main Program)
+\small
+\begin{algorithmic}[1]
+\STATE Get Analysis Options.
+\STATE Read Circuit from file and convert it into graph.
+\STATE Linearize non-linear components.
+\STATE Build Modified Nodal Matrix.
+\STATE Do Operating Point Analysis.
+\STATE Print Operating Point Solution.
+\IF {DC Analysis}
+\FOR{Sweep Voltage = Intial : Final}
+\STATE Do DC Analysis.
+\STATE Store output variables.
+\ENDFOR
+\STATE Print/Plot output.
+\ENDIF
+\IF {Transient Analysis}
+\FOR{time = Intial : Final}
+\STATE Do Transient Analysis.
+\STATE Store output variables.
+\ENDFOR
+\STATE Print/Plot output.
+\ENDIF
+\end{algorithmic}
+\normalsize
+
+{\bf Procedure:}{Get Analysis Options}
+\small
+\begin{algorithmic}[1]
+\IF{Operating Point Analysis}
+\STATE Analysis=Operating Point Analysis
+\ENDIF
+\IF{Transient Analysis}
+\STATE Analysis=Transient Analysis
+\STATE Get Start time, Stop time and Step size 
+\ENDIF
+\IF{DC Analysis}
+\STATE Analysis=DC Analysis
+\STATE Get Start voltage, Stop voltage and Step size 
+\ENDIF
+\STATE Get output variables for printing and plotting.
+\STATE Find number of nodes in the circuit.
+\end{algorithmic}
+
+{\bf Procedure:}{Build Modified Nodal Matrix (Stamp table approach)}
+\small
+\begin{algorithmic}[1]
+\STATE $Size(A,b) \gets N-1+T$
+\FORALL {Edges}
+\IF {Conductance}
+\STATE A(Source,Source)+=conductance value
+\STATE A(Source,Sink)-=conductance value
+\STATE A(Sink,Source)-=conductance value
+\ENDIF
+\IF {Current Source}
+\STATE b(Source)+= value
+\STATE b(Sink)-= value
+\ENDIF
+\IF {Voltage Source}
+\STATE A(Source,i*)=1; A(Sink,i*)=-1
+\STATE A(i*,Source)=1; A(i*,Sink)=-1
+\STATE b(i*)= value
+\ENDIF
+\IF {Voltage Controlled Current Source}
+\STATE A(Source,CSource)+= value; A(Source,CSink)-= value
+\STATE A(Sink,CSource)-= value; A(Sink,CSink)+= value
+\ENDIF
+\IF {Voltage controlled Voltage Source}
+\STATE A(Source,i*)=1; A(Sink,i*)=-1
+\STATE A(i*,Source)=1; A(i*,Sink)=-1
+\STATE A(i*,CSource)=-value; A(i*,CSink)=value
+\ENDIF
+\IF {Current controlled Current Source}
+\STATE A(Source,i*)=1; A(Sink,i*)=-1
+\STATE A(i*,i*)=1; A(i*,j*)=-value
+\ENDIF
+\IF {Current controlled Voltage Source}
+\STATE A(Source,i*)=1; A(Sink,i*)=-1
+\STATE A(i*,Source)=1; A(i*,Sink)=-1
+\STATE A(i*,i*)=-value
+\ENDIF
+\ENDFOR
+\end{algorithmic}
+$N$=Number of Nodes.\newline
+$T$=Number of devices whose device characteristic can not be expressed in terms of voltage.
+\normalsize
+\newline
+
+{\bf Procedure:}{Operating Point Analysis}
+\small
+\begin{algorithmic}[1]
+\STATE Find Node Potential and Current through devices whose device characteristic can not be expressed in terms of voltage.
+\STATE Find branch voltage and node potentail.
+\STATE Find branch current from branch voltage using device characteristics.
+\IF{Non-linear component}
+\STATE {\bf NR:} Check  device characteristics of non-linear devices.
+\IF {Device characteristics is not satisfied}
+\STATE Call Newton Raphson procedure
+\STATE Find Node Potential and Current through devices whose device characteristic can not be expressed in terms of voltage.
+\STATE Find branch current from branch voltage using device characteristics.
+\STATE Go to {\bf NR}
+\ENDIF
+\STATE Check for KCL
+\ENDIF 
+\end{algorithmic}
+\normalsize
+
+{\bf Procedure}{Check for Device characteristics of Non-linear elements}
+\small
+\begin{algorithmic}[1]
+\FORALL {Non-linear devices}
+\STATE Compute actual current/voltage by its device characteristics.
+\STATE Compare actual current/voltage with that of by anlysis.
+\ENDFOR
+\end{algorithmic}
+\normalsize
+
+{\bf Procedure:}{Newton Raphson}
+\small
+\begin{algorithmic}[1]
+\STATE Update the value of the linearized model of non-linear elements.
+\STATE Update Modified Nodal matrix.
+\end{algorithmic}
+\normalsize
+
+{\bf Procedure:}{Transient Analysis}
+\small
+\begin{algorithmic}[1]
+\STATE Discretize time dependent Component and Update Modified Nodal matrix.
+\STATE Do Operating Point Analysis.
+\end{algorithmic}
+\normalsize
+
+{\bf Procedure:}{Discretization}
+\small
+\begin{algorithmic}[1]
+\STATE Compute time dependent source value at time t.
+\STATE Compute the values of static model of dynamic component at time t.
+\STATE Update Modified Nodal matrix. 
+\end{algorithmic}
+\normalsize
+
+{\bf Procedure:}{DC Analysis}
+\small
+\begin{algorithmic}[1]
+\STATE Modify the value of the sweep source and update Modified Nodal matrix.
+\STATE Do Operating Point Analysis.
+\end{algorithmic}
+\normalsize
+
+\chapter*{Examples}
+In this chapter, some basic circuits and simulation results with minsim are presented. 
+\section*{RC Circuit}
+ 
+\end{document}          

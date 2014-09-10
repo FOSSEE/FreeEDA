@@ -1,0 +1,28 @@
+* eeschema netlist version 1.1 (spice format) creation date: monday 17 december 2012 10:57:14 am ist
+.include lm555n.sub
+
+* Plotting option vplot8_1
+.ic v(5)=0
+* 74ls109
+v1  3 0 5
+r3  6 0 1000
+c2  7 0 0.01e-6
+c1  5 0 100e-12
+r2  8 5 10000
+r1  3 8 1000
+x1  0 5 6 3 7 5 8 3 lm555n
+a1 [3 0 6 3 3] [3_in 0_in 6_in 3_in 3_in] u3adc
+a2 3_in ~0_in 6_in ~3_in ~3_in 2_out 1_out u3
+a3 [2_out 1_out] [2 1]  u3dac
+.model u3 d_jkff
+.model u3adc adc_bridge(in_low=0.8 in_high=2.0)
+.model u3dac dac_bridge(out_low=0.25 out_high=5.0 out_undef=1.8 t_rise=0.5e-9 t_fall=0.5e-9)
+
+.tran  50e-09 5e-06 0e-00
+
+* Control Statements 
+.control
+run
+plot v(6) v(2) 
+.endc
+.end

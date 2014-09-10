@@ -1,0 +1,22 @@
+* eeschema netlist version 1.1 (spice format) creation date: monday 17 december 2012 11:24:34 am ist
+
+* Printing option vprint1
+e1  4 6 1 2 0.5
+i1  0 6 1
+v1  3 0 1
+g1  6 1 0 2 0.5
+r6  1 0 1
+r3  2 0 1
+r5  1 2 0.5
+r4  2 6 1
+r2  4 0 1
+r1  4 3 1
+
+.op
+
+* Control Statements 
+.control
+run
+print v(1)
+.endc
+.end

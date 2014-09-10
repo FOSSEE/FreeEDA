@@ -1,0 +1,4 @@
+.model diode D( Is=880.5E-18 Nbvl=14.976 Cjo=175p Rs=20 Isr=1.859n 
++ Eg=1.11 M=.5516 Nbv=1.6989 N=1 Tbv1=-21.277u 
++ Bv=8.1 Fc=.5 Ikf=0 Xti=3 Nr=2 
++ Vj=.65 Ibv=20.245m Ibvl=1.9556m )

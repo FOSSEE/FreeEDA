@@ -1,0 +1,8 @@
+* Half-Wave Rectifier
+V1 1 0 sine (5 50)
+D1 1 2 mymodel (1e-8 0.026)
+R1 2 0 10000
+C1 2 0 10e-3
+.tran 0 100 0.5
+.plot v(1) v(2) 
+.end

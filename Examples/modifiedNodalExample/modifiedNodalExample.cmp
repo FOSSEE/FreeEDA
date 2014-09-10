@@ -1,0 +1,45 @@
+Cmp-Mod V01 Created by CvPCB (2011-05-25)-stable date = Monday 01 October 2012 11:03:36 AM IST
+
+BeginCmp
+TimeStamp = /50692613;
+Reference = R1;
+ValeurCmp = 1;
+IdModule  = R3;
+EndCmp
+
+BeginCmp
+TimeStamp = /5067FEAC;
+Reference = R2;
+ValeurCmp = 1;
+IdModule  = R3;
+EndCmp
+
+BeginCmp
+TimeStamp = /50692628;
+Reference = R3;
+ValeurCmp = 1;
+IdModule  = R3;
+EndCmp
+
+BeginCmp
+TimeStamp = /5069261E;
+Reference = R4;
+ValeurCmp = 1;
+IdModule  = R3;
+EndCmp
+
+BeginCmp
+TimeStamp = /5067FE8A;
+Reference = v1;
+ValeurCmp = DC;
+IdModule  = R1;
+EndCmp
+
+BeginCmp
+TimeStamp = /5067FE8E;
+Reference = v2;
+ValeurCmp = DC;
+IdModule  = R1;
+EndCmp
+
+EndListe

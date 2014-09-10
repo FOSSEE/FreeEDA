@@ -1,0 +1,172 @@
+PCBNEW-BOARD Version 1 date Friday 12 April 2013 02:43:29 PM IST
+
+# Created by Pcbnew(2012-apr-16-27)-stable
+
+$GENERAL
+encoding utf-8
+LayerCount 2
+Ly 1FFF8001
+EnabledLayers 1FFF8001
+Links 0
+NoConn 0
+Di 40424 25540 76751 39450
+Ndraw 0
+Ntrack 0
+Nzone 0
+BoardThickness 630
+Nmodule 2
+Nnets 4
+$EndGENERAL
+
+$SHEETDESCR
+Sheet A4 11700 8267
+Title ""
+Date "12 apr 2013"
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndSHEETDESCR
+
+$SETUP
+InternalUnit 0.000100 INCH
+Layers 2
+Layer[0] Back signal
+Layer[15] Front signal
+TrackWidth 80
+TrackClearence 100
+ZoneClearence 200
+TrackMinWidth 80
+DrawSegmWidth 150
+EdgeSegmWidth 150
+ViaSize 350
+ViaDrill 250
+ViaMinSize 350
+ViaMinDrill 200
+MicroViaSize 200
+MicroViaDrill 50
+MicroViasAllowed 0
+MicroViaMinSize 200
+MicroViaMinDrill 50
+TextPcbWidth 120
+TextPcbSize 600 800
+EdgeModWidth 150
+TextModSize 600 600
+TextModWidth 120
+PadSize 600 600
+PadDrill 320
+Pad2MaskClearance 100
+AuxiliaryAxisOrg 0 0
+PcbPlotParams (pcbplotparams (layerselection 3178497) (usegerberextensions true) (excludeedgelayer true) (linewidth 60) (plotframeref false) (viasonmask false) (mode 1) (useauxorigin false) (hpglpennumber 1) (hpglpenspeed 20) (hpglpendiameter 15) (hpglpenoverlay 2) (pscolor true) (psnegative false) (psa4output false) (plotreference true) (plotvalue true) (plotothertext true) (plotinvisibletext false) (padsonsilk false) (subtractmaskfromsilk false) (outputformat 1) (mirror false) (drillshape 1) (scaleselection 1) (outputdirectory ""))
+$EndSETUP
+
+$EQUIPOT
+Na 0 ""
+St ~
+$EndEQUIPOT
+$EQUIPOT
+Na 1 "GND"
+St ~
+$EndEQUIPOT
+$EQUIPOT
+Na 2 "N-000018"
+St ~
+$EndEQUIPOT
+$EQUIPOT
+Na 3 "N-000019"
+St ~
+$EndEQUIPOT
+$NCLASS
+Name "Default"
+Desc "This is the default net class."
+Clearance 100
+TrackWidth 80
+ViaDia 350
+ViaDrill 250
+uViaDia 200
+uViaDrill 50
+AddNet ""
+AddNet "GND"
+AddNet "N-000018"
+AddNet "N-000019"
+$EndNCLASS
+$MODULE 1pin
+Po 41500 38000 0 15 00200000 5167CFD9 ~~
+Li 1pin
+Cd module 1 pin (ou trou mecanique de percage)
+Kw DEV
+Sc 5167CFD9
+AR 1pin
+Op 0 0 0
+T0 0 -1200 400 400 0 100 N V 21 N "1PIN"
+T1 0 1100 400 400 0 100 N I 21 N "P***"
+DC 0 0 0 -900 150 21
+$PAD
+Sh "1" C 1600 1600 0 0 0
+Dr 1200 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po 0 0
+$EndPAD
+$EndMODULE  1pin
+$MODULE 3PIN_6mm
+Po 68000 29000 0 15 00200000 5167CFEC ~~
+Li 3PIN_6mm
+Cd module 2 pin (trou 6 mm)
+Kw DEV
+Sc 5167CFEC
+AR 
+Op 0 0 0
+T0 4000 -3000 600 600 0 120 N V 21 N "K1"
+T1 -3000 -3000 600 600 0 120 N V 21 N "CONN_3"
+DS -8500 -2500 8500 -2500 150 21
+DS 8500 -2500 8500 2500 150 21
+DS 8500 2500 -8500 2500 150 21
+DS -8500 2500 -8500 -2500 150 21
+$PAD
+Sh "1" C 4000 4000 0 0 0
+Dr 2400 0 0
+At STD N 00E0FFFF
+Ne 2 "N-000018"
+Po -5900 0
+$EndPAD
+$PAD
+Sh "3" C 4000 4000 0 0 0
+Dr 2400 0 0
+At STD N 00E0FFFF
+Ne 3 "N-000019"
+Po 5900 0
+$EndPAD
+$PAD
+Sh "2" C 4000 4000 0 0 0
+Dr 2400 0 0
+At STD N 00E0FFFF
+Ne 1 "GND"
+Po 0 0
+$EndPAD
+$SHAPE3D
+Na "device/douille_4mm(black).wrl"
+Sc 1.800000 1.800000 1.800000
+Of 0.000000 0.000000 0.000000
+Ro 0.000000 0.000000 0.000000
+$EndSHAPE3D
+$SHAPE3D
+Na "device/douille_4mm(red).wrl"
+Sc 1.800000 1.800000 1.800000
+Of -0.590000 0.000000 0.000000
+Ro 0.000000 0.000000 0.000000
+$EndSHAPE3D
+$SHAPE3D
+Na "device/douille_4mm(green).wrl"
+Sc 1.800000 1.800000 1.800000
+Of 0.590000 0.000000 0.000000
+Ro 0.000000 0.000000 0.000000
+$EndSHAPE3D
+$EndMODULE  3PIN_6mm
+$TRACK
+$EndTRACK
+$ZONE
+$EndZONE
+$EndBOARD

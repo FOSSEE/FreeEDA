@@ -1,0 +1,10 @@
+0.0    spice_vbs_0p0.txt
+0.2    spice_vbs_0p2.txt
+0.4    spice_vbs_0p4.txt
+0.6    spice_vbs_0p6.txt
+0.8    spice_vbs_0p8.txt
+1.0    spice_vbs_1p0.txt
+1.2    spice_vbs_1p2.txt
+1.4    spice_vbs_1p4.txt
+1.6    spice_vbs_1p6.txt
+1.8    spice_vbs_1p8.txt

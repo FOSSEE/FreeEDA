@@ -1,0 +1,18 @@
+* eeschema netlist version 1.1 (spice format) creation date: monday 17 december 2012 12:01:55 pm ist
+.include 1n4007.lib
+
+v1  3 1 sine(0 4 50 0 0)
+r1  4 0 1000
+d3  0 3 1n4007
+d4  0 1 1n4007
+d2  1 4 1n4007
+d1  3 4 1n4007
+
+.tran  100e-06 40e-03 0e-00
+
+* Control Statements 
+.control
+run
+plot v(3)-v(1) v(4) 
+.endc
+.end

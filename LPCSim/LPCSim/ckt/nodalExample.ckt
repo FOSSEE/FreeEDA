@@ -1,0 +1,10 @@
+*Nodal Analysis Example
+I1 0 1 dc 1
+R1 1 0 1
+R2 1 2 1
+R3 2 0 1
+R4 2 3a 2
+R5 3a 0 1
+I2 0 3a dc 1
+.op
+.end

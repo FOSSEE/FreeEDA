@@ -1,0 +1,10 @@
+* Example of current controlled voltage source
+I1 0 1 dc 1
+R1 1 0 0.2
+R2 1 2 0.1
+R3 4 0 0.2
+R4 2 3 0.1
+V1 2 4 dc 0
+H1 3 0 V1 2
+.op
+.end

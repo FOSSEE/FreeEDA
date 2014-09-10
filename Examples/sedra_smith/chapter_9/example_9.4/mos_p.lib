@@ -1,0 +1,6 @@
+.model mos_p PMOS( Cgso=877.2p Tox=100n Rs=70.6m Tt=140n Vto=-3.67 
++ Pb=.8 Rg=.811 Theta=0 Phi=.6 Fc=.5 
++ Delta=0 Vmax=0 Kappa=0 Rds=444.4K Level=3 
++ L=2u Mj=.5 Uo=300 Eta=0 W=1.9 
++ Cgdo=369.3p Gamma=0 Xj=0 Rd=60.66m Cbd=2.141n 
++ Is=52.23E-18 N=2 Kp=10.15u )

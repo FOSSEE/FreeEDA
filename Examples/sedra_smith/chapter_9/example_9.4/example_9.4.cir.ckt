@@ -1,0 +1,14 @@
+* eeschema netlist version 1.1 (spice format) creation date: thursday 16 may 2013 11:24:53 am ist
+.include mos_p.lib
+.include mos_n.lib
+
+m1 4 3 1 1 mos_p
+m2 4 3 0 0 mos_n
+* Plotting option vplot8_1
+v2  1 0 10
+v1  3 0 dc 10
+c1  4 0 .5p
+
+.dc  v1 0e-00 10e-00 1e-00
+.plot v(3) v(4) 
+.end

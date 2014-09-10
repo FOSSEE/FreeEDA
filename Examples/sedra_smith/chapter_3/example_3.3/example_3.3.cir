@@ -1,0 +1,17 @@
+* EESchema Netlist Version 1.1 (Spice format) creation date: Thursday 25 April 2013 02:05:01 PM IST
+
+* To exclude a component from the Spice Netlist add [Spice_Netlist_Enabled] user FIELD set to: N
+* To reorder the component spice node sequence add [Spice_Node_Sequence] user FIELD and define sequence: 2,1,0
+
+*Sheet Name:/
+U2  7 2 5 VPLOT8_1		
+U1  7 1 IPLOT		
+v1  1 0 5V		
+R1  1 1 2200		
+R2  3 4 1k		
+U3  4 2 IPLOT		
+v2  3 0 10V		
+U4  5 0 IPLOT		
+Q1  5 7 2 NPN		
+
+.end
