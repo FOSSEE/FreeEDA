@@ -248,11 +248,11 @@ else
   fi
 fi
 echo "Installation started..............."
-
-if [ -d $installDir/FreeEDA ]
+backup_freeeda="$installDir/FreeEDA"
+if [ -d "$backup_freeeda" ]
 then
-echo "Renaming your old FreeEDA folder to FreeEDA.bak"
-mv -r $installDir/FreeEDA $installDir/FreeEDA.bak
+echo "Renaming your old FreeEDA folder to FreeEDA.backup"
+mv -v $installDir/FreeEDA $installDir/FreeEDA.backup
 fi
 echo "Outof if loop"
 
@@ -286,6 +286,63 @@ sudo cp -v $installDir/FreeEDA/images/logo.png /usr/share/icons/freeeda.png
 
 echo "Setting up desktop icon..."
 cp -v freeeda.desktop $HOME/Desktop/
+
+function import_kicad_lib() {                                                   
+  # Copy FreeEDA libraries to kicad lib directory                               
+  
+  sudo cp -r FreeEDA/library/*.lib /usr/share/kicad/library/
+  sudo cp -r FreeEDA/library/*.dcm /usr/share/kicad/library/
+  
+  # --------------------                                                      
+  # Full path of 'kicad.pro file'[Verified for Ubuntu 12.04]                  
+  KICAD_PRO="/usr/share/kicad/template/kicad.pro"
+  KICAD_ORIGINAL="/usr/share/kicad/template/kicad.pro.original"                             
+  # --------------------                                                      
+  
+  if [ -f "$KICAD_ORIGINAL" ]
+  then 
+    echo "kicad.pro original file found..."
+    sudo cp -rv ${KICAD_ORIGINAL} ${KICAD_PRO}
+  else 
+    echo "Making copy of original file"
+    sudo cp -rv ${KICAD_PRO}{,.original}                                             
+  fi
+  # Get number of libs in FreeEDA/Library directory                             
+  kicadlibfiles_num=$(cat ${KICAD_PRO} | awk "/\[eeschema\/libraries\]/,/\[cvpcb\]/" | grep -i "LibName" | wc -l)
+  
+  # Remove string '.lib' as 'kicad.pro' does not store library name           
+  # with '.lib' as a suffix                                                   
+  libfiles=$(ls -1 FreeEDA/library | grep ".lib")      
+  
+  # Start the counter from number of libs already available                   
+  COUNTER=${kicadlibfiles_num}                                                
+  
+  # Make a copy of original file by the extension .original                   
+  #sudo cp -rv ${KICAD_PRO}{,.original}                                             
+  
+  #Make copy of Original file with write permission
+  sudo cp -rv ${KICAD_PRO} $HOME/kicad_pro 
+  sudo chmod 777 $HOME/kicad_pro 
+  
+  # Write lib in a loop                                                       
+  for i in ${libfiles}                                                        
+  do                                                                          
+    COUNTER=$((COUNTER + 1))                                                      
+    FILENAME=$(echo ${i} | sed -e "s/.lib//g" | sed -e "s/^/LibName${COUNTER}=/") 
+    echo $FILENAME                                                               
+    echo "LibName$((COUNTER - 1))"
+    sed -i -e '/LibName'"$((COUNTER - 1))"'/a '"${FILENAME}"'' $HOME/kicad_pro  
+           
+  done 
+  
+  #Copying file again to its original location
+  sudo cp -rv $HOME/kicad_pro ${KICAD_PRO} 
+  sudo chmod 644 ${KICAD_PRO} 
+  #Remove temp kicad_pro file from HOME.
+  rm $HOME/kicad_pro 
+}                                                                               
+
+import_kicad_lib                 
 
 echo "Installation completed"
 
