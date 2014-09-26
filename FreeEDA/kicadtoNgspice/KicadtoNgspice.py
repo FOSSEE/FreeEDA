@@ -2270,10 +2270,6 @@ def convertICintoBasicBlocks(schematicInfo,outputOption,guimodelvalue):
 	ic='  Enter initial condition on output (default=0): '
         print "-----------------------------------------------------------"
         guimodelvalue.append([index,compline,compType,compName,Comment,Title,words[1],ic])
-      elif compType=="opamp1":
-        f = open(FreeEDA_HOME)
-        data = f.read()
-        schematicInfo.insert(index,data)
       elif compType=="transfo":
         schematicInfo.append("a"+str(k)+" ("+words[1]+" "+words[2]+") (2mmf "+words[2]+") "+compName+"_primary")
 	k=k+1
