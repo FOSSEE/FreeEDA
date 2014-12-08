@@ -344,6 +344,11 @@ function import_kicad_lib() {
 
 import_kicad_lib                 
 
+#Storing installation directory location of FreeEDA
+
+echo $installDir > installed_location
+
+
 echo "Installation completed"
 
 
