@@ -21,15 +21,15 @@ done < installed_location
 
 
 
-#Removing python,ngspice and kicad from synaptic
+#Removing ngspice and kicad from synaptic
 
-echo -n "This will uninstall python,ngspice and kicad. Are you sure to uninstall it (y/n): "
+echo -n "This will uninstall ngspice and kicad. Are you sure to uninstall it (y/n): "
 read answer
 
 if [ $answer == "y" -o $answer == "Y" ];then
-       sudo  apt-get purge kicad python ngspice
+       sudo  apt-get purge kicad ngspice
 else
-    echo "Uninstallation script completed without uninstalling python,kicad and ngspice" 
+    echo "Uninstallation script completed without uninstalling kicad and ngspice" 
     exit 0;
 fi
 
